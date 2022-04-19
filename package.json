@@ -1,5 +1,5 @@
 {
-  "name": "primagi-qr-view",
+  "name": "primagi-friend-book",
   "version": "1.1",
   "scripts": {
     "start": "webpack-dev-server -d -w --inline",
