@@ -9,8 +9,8 @@ export const SWUpdateDialog: React.FC<{ registration: ServiceWorkerRegistration 
     padding: 5,
   };
   const buttonStyle: React.CSSProperties = {
-    backgroundColor: 'ff6aac',
-    color: 'fff',
+    backgroundColor: '#ff6aac',
+    color: '#fff',
     boxShadow: '0 6px 16px rgb(255 106 172 / 50%)',
     fontWeight: 600,
     borderRadius: 3,
