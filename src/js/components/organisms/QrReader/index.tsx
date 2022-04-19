@@ -5,7 +5,8 @@ import * as actions from '../../../actions';
 import { RootState } from '../../../reducers';
 import jsQR, { QRCode } from 'jsqr';
 import { QRCodeRenderersOptions } from 'qrcode';
-import { MenuItem, Paper, Select, SelectChangeEvent, Typography } from '@mui/material';
+import { IconButton, MenuItem, Paper, Select, SelectChangeEvent, Typography } from '@mui/material';
+import ClipboardIcon from '@mui/icons-material/ContentCopy';
 import Qrcode from '../../molecules/Qrcode';
 import { binStrToByte, stopRecogQR } from '../../../common/util';
 
@@ -26,7 +27,7 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
 
   const [deviceList, setDeviceList] = React.useState<MediaDeviceInfo[]>([]);
   const [renderDeviceId, setDeviceId] = React.useState(props.readerDeviceId);
-  const [qrData, setQrData] = React.useState<QRCode | null>(null);
+  const [qrData, setQrData] = React.useState<{ byte: number[]; data: string; version: number } | null>(null);
 
   useEffect(() => {
     startRecogQr();
@@ -104,7 +105,7 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
         console.log(code);
         if (code.binaryData.length > 0) {
           stopRecogQR();
-          setQrData(code);
+          setQrData({ byte: code.binaryData, data: code.data, version: code.version });
         }
       }
     }, 10);
@@ -114,6 +115,15 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
   const changeDeviceId = (event: SelectChangeEvent<string>, child: React.ReactNode) => {
     props.updateDeviceId(event.target.value);
     startRecogQr(event.target.value);
+  };
+
+  const copyQr = (qr: string) => () => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(qr);
+      props.changeNotify(true, 'info', 'バイナリ文字列をコピーしました', true);
+    } else {
+      props.changeNotify(true, 'warning', 'このブラウザはコピーに非対応です', true);
+    }
   };
 
   const createQrReader = () => {
@@ -136,10 +146,11 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
   };
 
   const createQrResult = () => {
-    const qr = qrData as QRCode;
-    const binStr = qr.binaryData.map((item) => `00${item.toString(16)}`.slice(-2)).join('');
-    const txt = qr.data;
-    const version = qr.version;
+    const byte = qrData?.byte ?? [];
+    const txt = qrData?.data ?? '';
+    const binStr = byte.map((item) => `00${item.toString(16)}`.slice(-2)).join('');
+
+    const version = qrData?.version ?? 0;
     const options: QRCodeRenderersOptions = {
       errorCorrectionLevel: 'M',
       margin: 2,
@@ -149,13 +160,18 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
     return (
       <div>
         <div style={{ textAlign: 'center' }}>
-          <Qrcode data={qr.binaryData} options={options} tagType={'img'} />
+          <Qrcode data={byte} options={options} tagType={'img'} />
         </div>
-        <div>
+        <div style={{ marginBottom: 50 }}>
           <Typography variant="h5">バイナリ(16進)</Typography>
           <Typography variant="body1" style={{ wordBreak: 'break-all' }}>
             {binStr}
           </Typography>
+          <div style={{ float: 'right', marginRight: 10 }} onClick={copyQr(binStr)}>
+            <IconButton>
+              <ClipboardIcon />
+            </IconButton>
+          </div>
         </div>
 
         {txt && (
@@ -188,6 +204,7 @@ const mapStateToProps = (state: RootState) => {
 // action
 const mapDispatchToProps = {
   updateDeviceId: actions.updateReaderDevice,
+  changeNotify: actions.changeNotify,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
