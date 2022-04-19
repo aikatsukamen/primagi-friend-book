@@ -57,7 +57,7 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
         console.log(window.registration);
       }
     } else {
-      props.changeNotify(true, 'info', '更新はありません');
+      props.changeNotify(true, 'info', '更新はありません.');
     }
   };
 
