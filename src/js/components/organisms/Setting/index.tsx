@@ -80,8 +80,10 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
       </div>
 
       <div className={classes.content}>
-        <Typography variant="h6">あと何か</Typography>
-        あるかな
+        <Typography variant="h6">アプリ更新</Typography>
+        <Button variant={'contained'} color={'error'} onClick={clickCacheDelete}>
+          実行
+        </Button>
       </div>
     </div>
   );
