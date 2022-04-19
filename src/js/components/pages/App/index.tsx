@@ -63,6 +63,7 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
   return (
     <ThemeProvider theme={props.theme}>
       <Paper className={classes.root}>
+        <div className={'SW-update-dialog'} />
         <NavTabs tabs={tabs} style={{ top: 0 }}>
           <QrList />
           <QrReader />
