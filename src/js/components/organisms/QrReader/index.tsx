@@ -30,6 +30,9 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
   const [qrData, setQrData] = React.useState<{ byte: number[]; data: string; version: number } | null>(null);
 
   useEffect(() => {
+    // 素振りして権限だけ要求しておく
+    navigator.mediaDevices.getUserMedia({ audio: false });
+
     startRecogQr();
   }, []);
 
@@ -45,7 +48,9 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
     devices = devices.filter((device) => device.kind.includes('videoinput'));
     setDeviceList(devices);
 
-    if (!devices.find((item) => item.deviceId === targetDeviceId)) return;
+    if (!devices.find((item) => item.deviceId === targetDeviceId)) {
+      return;
+    }
 
     const aspect =
       window.innerWidth - window.innerHeight > 0
