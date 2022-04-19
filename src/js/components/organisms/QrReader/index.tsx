@@ -138,8 +138,8 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
           <Select defaultValue={renderDeviceId} onChange={changeDeviceId} style={{ width: '90%' }}>
             {deviceList.map((item, index) => {
               return (
-                <MenuItem key={item.deviceId} value={item.deviceId ? item.deviceId : `デバイス${index}`}>
-                  {item.label}
+                <MenuItem key={item.deviceId} value={item.deviceId}>
+                  {item.label ? item.label : `デバイス${index}`}
                 </MenuItem>
               );
             })}
