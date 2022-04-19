@@ -48,6 +48,19 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
     props.changeNotify(true, 'warning', '未実装だよ！');
   };
 
+  const clickUpdate = () => {
+    if (window.registration) {
+      if (window.registration.waiting) {
+        window.registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+        window.location.reload();
+      } else {
+        console.log(window.registration);
+      }
+    } else {
+      props.changeNotify(true, 'info', '更新はありません');
+    }
+  };
+
   return (
     <div className={classes.root}>
       {/* QR表示サイズ */}
@@ -81,7 +94,7 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
 
       <div className={classes.content}>
         <Typography variant="h6">アプリ更新</Typography>
-        <Button variant={'contained'} color={'success'} onClick={clickCacheDelete}>
+        <Button variant={'contained'} color={'success'} onClick={clickUpdate}>
           実行
         </Button>
       </div>

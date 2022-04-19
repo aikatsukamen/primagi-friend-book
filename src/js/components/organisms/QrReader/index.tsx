@@ -68,12 +68,6 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
       audio: false,
       video: {
         aspectRatio: aspect,
-        // width: {
-        //   min: 720,
-        // },
-        // height: {
-        //   min: 720,
-        // },
         width: {
           min: 480,
           ideal: 1080,
