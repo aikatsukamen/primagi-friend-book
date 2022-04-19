@@ -39,8 +39,6 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
     const targetDeviceId = deviceId ? deviceId : renderDeviceId;
     console.log('startRecogQr deviceId=' + targetDeviceId);
     stopRecogQR();
-    const width = 1080;
-    const height = 1920;
 
     let devices = await navigator.mediaDevices.enumerateDevices();
     devices = devices.filter((device) => device.kind.includes('videoinput'));
@@ -52,8 +50,12 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
     const mediaStream = await navigator.mediaDevices.getUserMedia({
       audio: false,
       video: {
-        width,
-        height,
+        width: {
+          min: 720,
+        },
+        height: {
+          min: 720,
+        },
         deviceId: targetDeviceId,
         facingMode: 'environment',
         frameRate: { ideal: 60, max: 60 },
@@ -61,17 +63,19 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
     });
 
     document.querySelector('video')!.srcObject = mediaStream;
+    console.log(`${document.querySelector('video')!.width}  ${document.querySelector('video')!.height}`);
+
     const video = document.querySelector('video') as HTMLVideoElement;
     const canv = document.createElement('canvas');
-    canv.width = width;
-    canv.height = height;
+    canv.width = 720;
+    canv.height = 720;
     const context = canv.getContext('2d') as CanvasRenderingContext2D;
 
     // 認識処理
     const id = window.setInterval(function () {
-      context.drawImage(video, 0, 0, width, height);
+      context.drawImage(video, 0, 0, 720, 720);
 
-      const imageData = context.getImageData(0, 0, width, height);
+      const imageData = context.getImageData(0, 0, 720, 720);
       const code = jsQR(imageData.data, imageData.width, imageData.height);
       if (code) {
         // 読み取れたら結果出力
@@ -93,7 +97,7 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
   const createQrReader = () => {
     return (
       <div style={{ height: '100%' }}>
-        <video id="qrReader" autoPlay playsInline={true} className="qr_reader"></video>
+        <video id="qrReader" autoPlay playsInline={true} className="qr_reader" width={720} height={720}></video>
         <div style={{ position: 'absolute', bottom: 70, width: '90%', margin: '5%' }}>
           <Select defaultValue={renderDeviceId} onChange={changeDeviceId} style={{ width: '90%' }}>
             {deviceList.map((item) => {
@@ -114,7 +118,6 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
     const binStr = qr.binaryData.map((item) => `00${item.toString(16)}`.slice(-2)).join('');
     const txt = qr.data;
     const version = qr.version;
-    const bytes = binStrToByte(binStr);
     const options: QRCodeRenderersOptions = {
       errorCorrectionLevel: 'M',
       margin: 2,
