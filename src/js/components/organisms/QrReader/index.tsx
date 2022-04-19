@@ -131,7 +131,11 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
       <div style={{ height: '100%' }}>
         <video id="qrReader" autoPlay playsInline={true} className="qr_reader" width={720} height={720}></video>
         <div style={{ position: 'absolute', bottom: 70, width: '90%', margin: '5%' }}>
-          <Select defaultValue={renderDeviceId} onChange={changeDeviceId} style={{ width: '90%' }}>
+          <Typography variant={'h6'}>カメラデバイス選択</Typography>
+          <Select defaultValue={renderDeviceId} displayEmpty={true} onChange={changeDeviceId} style={{ width: '90%' }}>
+            <MenuItem key={'default'} value={''}>
+              ―
+            </MenuItem>
             {deviceList.map((item) => {
               return (
                 <MenuItem key={item.deviceId} value={item.deviceId}>
