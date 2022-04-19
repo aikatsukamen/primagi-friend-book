@@ -72,9 +72,11 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
         // },
         width: {
           min: 480,
+          ideal: 1080,
         },
         height: {
           min: 480,
+          ideal: 1080,
         },
         deviceId: targetDeviceId,
         facingMode: 'environment',
