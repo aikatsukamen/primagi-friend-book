@@ -23,7 +23,6 @@ serviceWorker.register({
     console.log(`'ServiceWorker registration successful with scope: ${registration.scope}`);
   },
   onUpdate: (registration) => {
-    window.registration = registration;
     if (registration.waiting) {
       ReactDOM.render(<SWUpdateDialog registration={registration} />, document.querySelector('.SW-update-dialog'));
     }
