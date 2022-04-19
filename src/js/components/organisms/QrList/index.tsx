@@ -22,7 +22,7 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
 
   return (
     <>
-      <div>qrregist</div>
+      <div>ここにリストとか</div>
     </>
   );
 };
