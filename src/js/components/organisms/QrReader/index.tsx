@@ -117,10 +117,10 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
     startRecogQr(event.target.value);
   };
 
-  const copyQr = (qr: string) => () => {
+  const copyQr = (qr: string, category: string) => () => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(qr);
-      props.changeNotify(true, 'info', 'バイナリ文字列をコピーしました', true);
+      props.changeNotify(true, 'info', category + 'をコピーしました', true);
     } else {
       props.changeNotify(true, 'warning', 'このブラウザはコピーに非対応です', true);
     }
@@ -167,7 +167,7 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
           <Typography variant="body1" style={{ wordBreak: 'break-all' }}>
             {binStr}
           </Typography>
-          <div style={{ float: 'right', marginRight: 10 }} onClick={copyQr(binStr)}>
+          <div style={{ float: 'right', marginRight: 10 }} onClick={copyQr(binStr, 'バイナリ(16進)')}>
             <IconButton>
               <ClipboardIcon />
             </IconButton>
@@ -175,11 +175,16 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
         </div>
 
         {txt && (
-          <div>
+          <div style={{ marginBottom: 50 }}>
             <Typography variant="h5">テキスト</Typography>
             <Typography variant="body1" style={{ wordBreak: 'break-all' }}>
               {txt}
             </Typography>
+            <div style={{ float: 'right', marginRight: 10 }} onClick={copyQr(txt, 'テキスト')}>
+              <IconButton>
+                <ClipboardIcon />
+              </IconButton>
+            </div>
           </div>
         )}
 

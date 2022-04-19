@@ -78,6 +78,11 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
           削除！
         </Button>
       </div>
+
+      <div className={classes.content}>
+        <Typography variant="h6">あと何か</Typography>
+        あるかな
+      </div>
     </div>
   );
 };
