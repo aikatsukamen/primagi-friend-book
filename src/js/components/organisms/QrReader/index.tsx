@@ -136,9 +136,9 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
             <MenuItem key={'default'} value={''}>
               ―
             </MenuItem>
-            {deviceList.map((item) => {
+            {deviceList.map((item, index) => {
               return (
-                <MenuItem key={item.deviceId} value={item.deviceId}>
+                <MenuItem key={item.deviceId} value={item.deviceId ? item.deviceId : `デバイス${index}`}>
                   {item.label}
                 </MenuItem>
               );
