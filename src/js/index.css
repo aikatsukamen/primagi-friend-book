@@ -115,8 +115,7 @@ select {
 }
 
 .qr_reader {
-  width: 80vw;
-  margin-left: 10vw;
-  margin-top: 5vh;
+  width: 96vw;
+  margin-left: -1vw;
   max-height: 70vh;
 }
