@@ -46,19 +46,39 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
 
     if (!devices.find((item) => item.deviceId === targetDeviceId)) return;
 
+    const aspect =
+      window.innerWidth - window.innerHeight > 0
+        ? {
+            min: 0.5625,
+            ideal: 1.5,
+            max: 2,
+          }
+        : {
+            min: 0.5625,
+            ideal: 0.75,
+            max: 2,
+          };
+
     // カメラ起動
     const mediaStream = await navigator.mediaDevices.getUserMedia({
       audio: false,
       video: {
+        aspectRatio: aspect,
+        // width: {
+        //   min: 720,
+        // },
+        // height: {
+        //   min: 720,
+        // },
         width: {
-          min: 720,
+          min: 480,
         },
         height: {
-          min: 720,
+          min: 480,
         },
         deviceId: targetDeviceId,
         facingMode: 'environment',
-        frameRate: { ideal: 60, max: 60 },
+        frameRate: { ideal: 30, max: 60 },
       },
     });
 
