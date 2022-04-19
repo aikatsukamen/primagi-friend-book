@@ -30,9 +30,6 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
   const [qrData, setQrData] = React.useState<{ byte: number[]; data: string; version: number } | null>(null);
 
   useEffect(() => {
-    // 素振りして権限だけ要求しておく
-    navigator.mediaDevices.getUserMedia({ audio: false });
-
     startRecogQr();
   }, []);
 
@@ -46,6 +43,7 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
 
     let devices = await navigator.mediaDevices.enumerateDevices();
     devices = devices.filter((device) => device.kind.includes('videoinput'));
+    console.log(devices);
     setDeviceList(devices);
 
     if (!devices.find((item) => item.deviceId === targetDeviceId)) {
@@ -84,7 +82,7 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
           min: 480,
           ideal: 1080,
         },
-        deviceId: targetDeviceId,
+        deviceId: targetDeviceId ? targetDeviceId : undefined,
         facingMode: 'environment',
         frameRate: { ideal: 30, max: 60 },
       },
@@ -137,10 +135,7 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
         <video id="qrReader" autoPlay playsInline={true} className="qr_reader" width={720} height={720}></video>
         <div style={{ position: 'absolute', bottom: 70, width: '90%', margin: '5%' }}>
           <Typography variant={'h6'}>カメラデバイス選択</Typography>
-          <Select defaultValue={renderDeviceId} displayEmpty={true} onChange={changeDeviceId} style={{ width: '90%' }}>
-            <MenuItem key={'default'} value={''}>
-              ―
-            </MenuItem>
+          <Select defaultValue={renderDeviceId} onChange={changeDeviceId} style={{ width: '90%' }}>
             {deviceList.map((item, index) => {
               return (
                 <MenuItem key={item.deviceId} value={item.deviceId ? item.deviceId : `デバイス${index}`}>
