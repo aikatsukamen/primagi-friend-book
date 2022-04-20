@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { makeStyles } from '@mui/styles';
 import * as actions from '../../../actions';
 import { RootState } from '../../../reducers';
-import { Button, FormControl, FormControlLabel, FormLabel, Hidden, Paper, Radio, RadioGroup, Typography } from '@mui/material';
+import { Button, FormControl, FormControlLabel, Radio, RadioGroup, Slider, Stack, Typography } from '@mui/material';
 import customTheme from '../../../theme';
+import Qrcode from '../../molecules/Qrcode';
 
 const useStyles = () =>
   makeStyles({
@@ -31,8 +32,14 @@ type ActionProps = typeof mapDispatchToProps;
 type PropsType = ComponentProps & ActionProps;
 const App: React.SFC<PropsType> = (props: PropsType) => {
   const classes = useStyles();
-  const changeQrSize: React.ChangeEventHandler<HTMLInputElement> = (event) => {
-    //
+  const [qrSize, setQrSize] = React.useState<number>(props.qrsize);
+  const changeQrSize = () => {
+    props.updateQrSize(qrSize);
+  };
+
+  const handleQrSliceChange = (event: Event, value: number | number[], activeThumb: number) => {
+    // console.log(value);
+    setQrSize(value as number);
   };
 
   const lightTheme = customTheme('light');
@@ -48,12 +55,94 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
     props.changeNotify(true, 'warning', '未実装だよ！');
   };
 
+  const createQrCode = () => {
+    console.log('createQrCode' + qrSize);
+    return (
+      <div style={{ height: qrSize }}>
+        <Qrcode
+          key={qrSize}
+          data={[
+            0,
+            10,
+            20,
+            30,
+            40,
+            50,
+            60,
+            70,
+            80,
+            90,
+            0,
+            10,
+            20,
+            30,
+            40,
+            50,
+            60,
+            70,
+            80,
+            90,
+            0,
+            10,
+            20,
+            30,
+            40,
+            50,
+            60,
+            70,
+            80,
+            90,
+            0,
+            10,
+            20,
+            30,
+            40,
+            50,
+            60,
+            70,
+            80,
+            90,
+            0,
+            10,
+            20,
+            30,
+            40,
+            50,
+            60,
+            70,
+            80,
+            90,
+          ]}
+          options={{
+            errorCorrectionLevel: 'M',
+            margin: 2,
+            width: qrSize,
+          }}
+          tagType={'img'}
+        />
+      </div>
+    );
+  };
+
+  useEffect(() => {
+    //
+  }, [qrSize]);
+
   return (
     <div className={classes.root}>
       {/* QR表示サイズ */}
       <div className={classes.content}>
         <Typography variant="h6">QRの表示サイズ</Typography>
-        <input type={'tel'} defaultValue={props.qrsize} onChange={changeQrSize} />
+        <Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center" style={{ width: '90vw' }}>
+          <Slider value={qrSize} min={50} max={350} onChange={handleQrSliceChange} />
+        </Stack>
+
+        {createQrCode()}
+        <div>
+          <Button variant={'contained'} color={'info'} onClick={changeQrSize} disabled={props.qrsize === qrSize}>
+            反映
+          </Button>
+        </div>
       </div>
 
       {/* テーマ設定 */}
@@ -94,6 +183,7 @@ const mapStateToProps = (state: RootState) => {
 const mapDispatchToProps = {
   updateTheme: actions.updateTheme,
   changeNotify: actions.changeNotify,
+  updateQrSize: actions.updateDispQr,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

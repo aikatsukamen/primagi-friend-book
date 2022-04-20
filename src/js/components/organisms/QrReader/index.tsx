@@ -3,12 +3,12 @@ import { connect } from 'react-redux';
 import { makeStyles } from '@mui/styles';
 import * as actions from '../../../actions';
 import { RootState } from '../../../reducers';
-import jsQR, { QRCode } from 'jsqr';
+import jsQR from 'jsqr';
 import { QRCodeRenderersOptions } from 'qrcode';
-import { IconButton, MenuItem, Paper, Select, SelectChangeEvent, Typography } from '@mui/material';
+import { IconButton, MenuItem, Select, SelectChangeEvent, Typography } from '@mui/material';
 import ClipboardIcon from '@mui/icons-material/ContentCopy';
 import Qrcode from '../../molecules/Qrcode';
-import { binStrToByte, stopRecogQR } from '../../../common/util';
+import { stopRecogQR } from '../../../common/util';
 
 const useStyles = () =>
   makeStyles({
@@ -105,7 +105,7 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
           setQrData({ byte: code.binaryData, data: code.data, version: code.version });
         }
       }
-    }, 10);
+    }, 50);
     window.codeReaderTimer = id;
   };
 

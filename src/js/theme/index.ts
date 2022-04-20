@@ -19,6 +19,14 @@ const lighttheme = createTheme({
         },
       },
     },
+    MuiTypography: {
+      styleOverrides: {
+        h6: {
+          fontWeight: 600,
+          color: 'black',
+        },
+      },
+    },
   },
 });
 
@@ -48,13 +56,14 @@ const darktheme = createTheme({
         },
       },
     },
-    // MuiButtonBase: {
-    //   styleOverrides: {
-    //     root: {
-    //       backgroundColor: '#15202B',
-    //     },
-    //   },
-    // },
+    MuiTypography: {
+      styleOverrides: {
+        h6: {
+          fontWeight: 600,
+          color: 'white',
+        },
+      },
+    },
   },
   palette: {
     primary: {

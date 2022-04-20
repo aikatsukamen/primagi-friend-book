@@ -1,24 +1,15 @@
 import { createAction } from 'typesafe-actions';
 import { RootState } from '../reducers';
 import { DialogState } from '../reducers/notify';
+import { Card } from '../types/global';
 
 const OPEN_NOTIFY = 'OPEN_NOTIFY';
 const CLOSE_NOTIFY = 'CLOSE_NOTIFY';
 const OPEN_DIALOG = 'OPEN_DIALOG';
 const CLOSE_DIALOG = 'CLOSE_DIALOG';
 
-const RELOAD_TWEET_LIST = 'RELOAD_TWEET_LIST';
-
 const DIALOG_YES = 'DIALOG_YES';
 const DIALOG_NO = 'DIALOG_NO';
-
-const UPLOAD_MEDIA = 'UPLOAD_MEDIA';
-const STORE_MEDIA = 'STORE_MEDIA';
-const DELETE_MEDIA = 'DELETE_MEDIA';
-
-const LOGIN_DISCORD = 'LOGIN_DISCORD';
-const LOGOUT_DISCORD = 'LOGOUT_DISCORD';
-const STORE_DISCORD_USER_NAME = 'STORE_DISCORD_USER_NAME';
 
 const UPDATE_STATUS = 'UPDATE_STATUS';
 export const updateStatus = createAction(UPDATE_STATUS, (action) => {
@@ -46,30 +37,6 @@ export const dialogNo = createAction(DIALOG_NO, (action) => {
   return (args: any) => action(args);
 });
 
-/** ツイートリロードボタン */
-export const reloadTweetList = createAction(RELOAD_TWEET_LIST);
-
-/** アップロードするファイルを取消 */
-export const deleteMedia = createAction(DELETE_MEDIA, (action) => {
-  return (index: number) => action(index);
-});
-
-// Discord
-/** ログインする */
-export const loginDiscord = createAction(LOGIN_DISCORD, (action) => {
-  return () => action();
-});
-
-/** ログアウトする */
-export const logoutDiscord = createAction(LOGOUT_DISCORD, (action) => {
-  return () => action();
-});
-
-/** Discordのユーザ名を格納 */
-export const storeDiscordUserName = createAction(STORE_DISCORD_USER_NAME, (action) => {
-  return (username: string | null) => action(username);
-});
-
 // テーマ設定
 const UPDATE_THEME = 'UPDATE_THEME';
 export const updateTheme = createAction(UPDATE_THEME, (action) => {
@@ -78,11 +45,31 @@ export const updateTheme = createAction(UPDATE_THEME, (action) => {
 
 // コードリーダーのデバイスを変更
 const UPDATE_READER_DEVICE = 'UPDATE_READER_DEVICE';
+/** コードリーダーのデバイスIDを選択 */
 export const updateReaderDevice = createAction(UPDATE_READER_DEVICE, (action) => {
   return (deviceId: string) => action(deviceId);
 });
-// コードリーダーが動いてるタイマー
-const UPDATE_READER_TIMER = 'UPDATE_READER_TIMER';
-export const updateReaderTimer = createAction(UPDATE_READER_TIMER, (action) => {
-  return (timer: number) => action(timer);
+
+// 登録
+const POST_FRIEND_CARD = 'POST_FRIEND_CARD';
+/** フレンドカードの登録、更新 */
+export const postFriendCard = createAction(POST_FRIEND_CARD, (action) => {
+  return (obj: Card) => action(obj);
+});
+
+const DELETE_FRIEND_CARD_CONFIRM = 'DELETE_FRIEND_CARD_CONFIRM';
+/** フレンドカードの削除要求 */
+export const deleteFriendCardConfirm = createAction(DELETE_FRIEND_CARD_CONFIRM, (action) => {
+  return (id: number) => action(id);
+});
+
+const DELETE_FRIEND_CARD = 'DELETE_FRIEND_CARD';
+/** フレンドカードの削除 */
+export const deleteFriendCard = createAction(DELETE_FRIEND_CARD, (action) => {
+  return (id: number) => action(id);
+});
+
+const UPDATE_DISP_QR = 'UPDATE_DISP_QR';
+export const updateDispQr = createAction(UPDATE_DISP_QR, (action) => {
+  return (size: number) => action(size);
 });

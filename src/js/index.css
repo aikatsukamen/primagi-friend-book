@@ -119,3 +119,64 @@ select {
   margin-left: -1vw;
   max-height: 70vh;
 }
+
+.header {
+  position: sticky;
+  /* background: linear-gradient(90deg, #fe8ae1 0%, #d79fea 23%, #aabeff 80%, #87cfed 100%); */
+  top: 0px;
+  z-index: 1;
+  /* border-left: 2px solid #fd8be2;
+  border-right: 2px solid #89ceee; */
+  padding: 5px;
+}
+
+.header-inner {
+  padding: 2px;
+  /* background: #fff; */
+  border-radius: 5px;
+  border: pink 1px solid;
+}
+
+.content {
+  width: calc(100% - 2em - 2px);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  grid-auto-rows: 1fr;
+  grid-gap: 0.8em;
+  border: 1px solid #ddd;
+  padding: 0.5em;
+  margin: 0.5em;
+  /* background: #fff; */
+  border-radius: 5px;
+}
+
+.closeButton {
+  background: #ff6eb4;
+  color: aliceblue;
+  border-radius: 20px;
+  width: 30px;
+  height: 30px;
+}
+
+.registButton {
+  background: #ff6eb4;
+  color: aliceblue;
+  border-radius: 20px;
+}
+
+.modalInner {
+  padding: 10px;
+  width: 80vw;
+  max-width: 600px;
+  min-width: 300px;
+}
+
+.bokashi {
+  letter-spacing: 6px;
+  text-shadow: 3px 3px 3px #ffffff, -3px 3px 3px #ffffff, 3px -3px 3px #ffffff, -3px -3px 3px #ffffff, 3px 0px 3px #ffffff, 0px 3px 3px #ffffff, -3px 0px 3px #ffffff, 0px -3px 3px #ffffff;
+}
+
+.bokashiDark {
+  letter-spacing: 6px;
+  text-shadow: 3px 3px 3px #000000, -3px 3px 3px #000000, 3px -3px 3px #000000, -3px -3px 3px #000000, 3px 0px 3px #000000, 0px 3px 3px #000000, -3px 0px 3px #000000, 0px -3px 3px #000000;
+}
