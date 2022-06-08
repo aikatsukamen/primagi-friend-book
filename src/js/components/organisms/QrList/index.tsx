@@ -162,10 +162,16 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
                   コーデ
                 </Typography>
                 <Typography className={props.theme === 'light' ? 'bokashi' : 'bokashiDark'}>{openCard.coordinate}</Typography>
-                <Typography className={props.theme === 'light' ? 'bokashi' : 'bokashiDark'} style={{ fontSize: 'small', marginTop: 10 }}>
-                  ひとこと
-                </Typography>
-                <Typography className={props.theme === 'light' ? 'bokashi' : 'bokashiDark'}>{openCard.comment}</Typography>
+                {openCard.comment ? (
+                  <>
+                    <Typography className={props.theme === 'light' ? 'bokashi' : 'bokashiDark'} style={{ fontSize: 'small', marginTop: 10 }}>
+                      ひとこと
+                    </Typography>
+                    <Typography className={props.theme === 'light' ? 'bokashi' : 'bokashiDark'}>{openCard.comment}</Typography>
+                  </>
+                ) : (
+                  ''
+                )}
 
                 <div style={{ marginTop: 30 }}>
                   {openCard.tags.map((tag, index) => {
