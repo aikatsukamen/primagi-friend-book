@@ -127,20 +127,21 @@ select {
   z-index: 1;
   /* border-left: 2px solid #fd8be2;
   border-right: 2px solid #89ceee; */
-  padding: 5px;
+  padding: 0px;
 }
 
 .header-inner {
-  padding: 2px;
+  padding: 0px;
   /* background: #fff; */
   border-radius: 5px;
-  border: pink 1px solid;
+  /* border: pink 1px solid; */
 }
 
 .content {
   width: calc(100% - 2em - 2px);
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  /* 個数が少ない時に真ん中にしたいならauto-fit */
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   grid-auto-rows: 1fr;
   grid-gap: 0.8em;
   border: 1px solid #ddd;
@@ -166,12 +167,16 @@ select {
 
 .modalInner {
   padding: 10px;
-  width: 80vw;
+  width: 90vw;
   max-width: 600px;
   min-width: 300px;
+  height: calc(90vh - 72px);
+  overflow-y: auto;
+  background-color: rgba(0, 0, 0, 0.4)
 }
 
 .bokashi {
+  font-weight: 600 !important;
   letter-spacing: 6px;
   text-shadow: 3px 3px 3px #ffffff, -3px 3px 3px #ffffff, 3px -3px 3px #ffffff, -3px -3px 3px #ffffff, 3px 0px 3px #ffffff, 0px 3px 3px #ffffff, -3px 0px 3px #ffffff, 0px -3px 3px #ffffff;
 }

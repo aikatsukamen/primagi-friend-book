@@ -114,15 +114,27 @@ const config: Configuration = {
       maximumFileSizeToCacheInBytes: 20 * 1024 * 1024,
       runtimeCaching: [
         {
-          urlPattern: new RegExp('https://cdn.primagi.jp/.*'),
+          urlPattern: new RegExp('https://imgur.com/.*'),
           handler: 'CacheFirst',
           options: {
-            cacheName: 'primagi',
+            cacheName: 'imgur',
             expiration: {
-              maxEntries: 3000,
+              maxEntries: 5000,
               maxAgeSeconds: 30 * 24 * 60 * 60,
             },
-            cacheableResponse: { statuses: [0, 200] },
+            cacheableResponse: { statuses: [200] },
+          },
+        },
+        {
+          urlPattern: new RegExp('https://files.kirakiratter.com/.*'),
+          handler: 'CacheFirst',
+          options: {
+            cacheName: 'kirakiratter',
+            expiration: {
+              maxEntries: 5000,
+              maxAgeSeconds: 30 * 24 * 60 * 60,
+            },
+            cacheableResponse: { statuses: [200] },
           },
         },
       ],

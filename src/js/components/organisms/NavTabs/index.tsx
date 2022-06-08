@@ -31,7 +31,7 @@ type ComponentProps = {
 
 const NavTabs: React.SFC<ComponentProps & React.Props<any>> = (props) => {
   const classes = useStyles();
-  const [tabIndex, setTabIndex] = React.useState(0);
+  const [tabIndex, setTabIndex] = React.useState(1);
 
   const handleChange = (event: React.ChangeEvent, newValue: any) => {
     setTabIndex(newValue);

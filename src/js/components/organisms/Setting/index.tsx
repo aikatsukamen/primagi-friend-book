@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { makeStyles } from '@mui/styles';
 import * as actions from '../../../actions';
 import { RootState } from '../../../reducers';
-import { Button, FormControl, FormControlLabel, Radio, RadioGroup, Slider, Stack, Typography } from '@mui/material';
+import { Button, Divider, FormControl, FormControlLabel, Radio, RadioGroup, Slider, Stack, Typography } from '@mui/material';
 import customTheme from '../../../theme';
 import Qrcode from '../../molecules/Qrcode';
 
@@ -49,10 +49,6 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
     setthemeMode(event.target.value);
     console.log(event.target.value);
     props.updateTheme(event.target.value);
-  };
-
-  const clickCacheDelete = () => {
-    props.changeNotify(true, 'warning', '未実装だよ！');
   };
 
   const createQrCode = () => {
@@ -159,13 +155,6 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
             </div>
           </RadioGroup>
         </FormControl>
-      </div>
-
-      <div className={classes.content}>
-        <Typography variant="h6">登録情報一括削除</Typography>
-        <Button variant={'contained'} color={'error'} onClick={clickCacheDelete}>
-          削除！
-        </Button>
       </div>
     </div>
   );

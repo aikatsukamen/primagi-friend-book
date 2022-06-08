@@ -1,5 +1,6 @@
-import { createAction } from 'typesafe-actions';
+import { action, createAction } from 'typesafe-actions';
 import { RootState } from '../reducers';
+import { SortType } from '../reducers/content';
 import { DialogState } from '../reducers/notify';
 import { Card } from '../types/global';
 
@@ -50,26 +51,22 @@ export const updateReaderDevice = createAction(UPDATE_READER_DEVICE, (action) =>
   return (deviceId: string) => action(deviceId);
 });
 
-// 登録
-const POST_FRIEND_CARD = 'POST_FRIEND_CARD';
-/** フレンドカードの登録、更新 */
-export const postFriendCard = createAction(POST_FRIEND_CARD, (action) => {
-  return (obj: Card) => action(obj);
-});
-
-const DELETE_FRIEND_CARD_CONFIRM = 'DELETE_FRIEND_CARD_CONFIRM';
-/** フレンドカードの削除要求 */
-export const deleteFriendCardConfirm = createAction(DELETE_FRIEND_CARD_CONFIRM, (action) => {
-  return (id: number) => action(id);
-});
-
-const DELETE_FRIEND_CARD = 'DELETE_FRIEND_CARD';
-/** フレンドカードの削除 */
-export const deleteFriendCard = createAction(DELETE_FRIEND_CARD, (action) => {
-  return (id: number) => action(id);
-});
-
 const UPDATE_DISP_QR = 'UPDATE_DISP_QR';
 export const updateDispQr = createAction(UPDATE_DISP_QR, (action) => {
   return (size: number) => action(size);
+});
+
+const UPDATE_SORT_TYPE = 'UPDATE_SORT_TYPE';
+export const updateSortType = createAction(UPDATE_SORT_TYPE, (action) => {
+  return (type: SortType) => action(type);
+});
+
+const UPDATE_FAV_LIST = 'UPDATE_FAV_LIST';
+export const updateFavList = createAction(UPDATE_FAV_LIST, (action) => {
+  return (qr: string, value: number | undefined) => action({ qr, value });
+});
+
+const UPDATE_CARD_LIST = 'UPDATE_CARD_LIST';
+export const updateCardList = createAction(UPDATE_CARD_LIST, (action) => {
+  return (cardList: Card[]) => action(cardList);
 });

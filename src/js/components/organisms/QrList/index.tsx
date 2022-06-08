@@ -22,43 +22,44 @@ type ComponentProps = ReturnType<typeof mapStateToProps>;
 type ActionProps = typeof mapDispatchToProps;
 
 type PropsType = ComponentProps & ActionProps;
-const initCard: Card = { id: 0, name: '', qr: '', hasImage: false };
+const initCard: Card = { comment: '', coordinate: '', img: '', name: '', qr: '', tags: [], timestamp: '', username: '' };
 type ImageMap = {
   [hash: number]: string;
 };
 
 const App: React.SFC<PropsType> = (props: PropsType) => {
   const classes = useStyles();
-  const [registerModalOpen, setregisterModalOpen] = React.useState(false);
-  // 0:新規 1:編集
-  const [registerModalMode, setregisterModalMode] = React.useState<0 | 1>(0);
   const [cardModalOpen, setcardModalOpen] = React.useState(false);
   const [openCard, setOpenCard] = React.useState<Card>(initCard);
-  // idをkeyとした画像の一覧
-  const [imageMap, setImageMAp] = React.useState<ImageMap>({});
+  // 表示対象のカード
   const [dispCardList, setDispCardList] = React.useState<Card[]>([]);
 
+  const [searchWord, setSearchWord] = React.useState<string>('');
+  const changeSearchWord: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    setSearchWord(e.target.value);
+  };
+
   useEffect(() => {
-    loadImageFromDb();
     setDispCardList(props.cardList);
   }, [JSON.stringify(props.cardList)]);
 
-  const loadImageFromDb = async () => {
-    const map: ImageMap = {};
-    for (const card of props.cardList) {
-      if (!card.hasImage) continue;
+  useEffect(() => {
+    // フィルターとか検索契機
+    const newDispCardList: typeof dispCardList = props.cardList.filter((card) => {
+      let isHit = false;
 
-      const file = await window.fstorage.getItem(card.id.toString());
-      if (typeof file === 'string') {
-        map[card.id] = file;
-      }
-    }
-    setImageMAp(map);
-    console.log('imageMap\n' + JSON.stringify(map, null, '  '));
-  };
+      if (card.name.includes(searchWord)) isHit = true;
+      if (card.username.includes(searchWord)) isHit = true;
+      if (card.coordinate.includes(searchWord)) isHit = true;
+      if (card.comment.includes(searchWord)) isHit = true;
+
+      return isHit;
+    });
+
+    setDispCardList(newDispCardList);
+  }, [searchWord]);
 
   const closeModal = () => {
-    setregisterModalOpen(false);
     setcardModalOpen(false);
     setOpenCard(initCard);
   };
@@ -70,88 +71,6 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
     setcardModalOpen(true);
   };
 
-  const editCard = (card: Card | undefined) => () => {
-    if (card) {
-      setOpenCard(card);
-      setregisterModalMode(1);
-    } else {
-      const id = Math.floor(new Date().getTime() / 1000);
-      setOpenCard({ id: id, name: '', qr: '', hasImage: false });
-      setregisterModalMode(0);
-    }
-    setcardModalOpen(false);
-    setregisterModalOpen(true);
-  };
-
-  const registCard = () => {
-    const nameDom = document.getElementById('card_name') as HTMLInputElement;
-    const name = nameDom.value.trim();
-    const qrDom = document.getElementById('card_qr') as HTMLInputElement;
-    const qr = qrDom.value.trim();
-    const imageDom = document.getElementById('card_image') as HTMLInputElement;
-    const imagefilename = imageDom.value;
-
-    console.log(name);
-    console.log(qr);
-    console.log(imagefilename);
-    // console.log(imageFile);
-
-    if (!name) {
-      props.changeNotify(true, 'warning', 'なまえを入れてね');
-      return;
-    }
-    if (name.length > 30) {
-      props.changeNotify(true, 'warning', 'なまえが長すぎるよ！');
-      return;
-    }
-    if (!qr) {
-      props.changeNotify(true, 'warning', 'QRを入れてね');
-      return;
-    }
-    if (!qr.match(/^[a-fA-F0-9]+$/)) {
-      props.changeNotify(true, 'warning', 'QRにはバイナリ文字列だけを入れてね');
-      return;
-    }
-    if (qr.length > 60) {
-      props.changeNotify(true, 'warning', 'そんなに長いQRはプリマジじゃないです');
-      return;
-    }
-
-    // 登録
-    props.postFriendCard({
-      ...openCard,
-      name,
-      qr,
-    });
-    // モーダル閉じる
-    closeModal();
-  };
-
-  const uploadImage = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //
-    console.log(e);
-    const target = e.target;
-    const file = target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const file = e.target?.result;
-      if (file) {
-        // IndexedDBに保存
-        window.fstorage.setItem(`${openCard.id}`, file);
-        imageMap[openCard.id] = file as string;
-        setImageMAp(imageMap);
-        setOpenCard({ ...openCard, hasImage: true });
-      }
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const clickDeleteCard = () => {
-    props.deleteFriendCardConfirm(openCard.id);
-    closeModal();
-  };
-
   const createImgCardList = (card: Card) => {
     const key = card.qr;
 
@@ -160,8 +79,8 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
         <Paper style={{ transform: 'translate(-50%, 0)', left: '50%', position: 'relative' }}>
           <img
             style={{ objectFit: 'contain' }}
-            src={imageMap[card.id]}
-            width={80}
+            src={card.img}
+            // width={80}
             height={160}
             loading={'lazy'}
             onError={(e) => {
@@ -188,32 +107,34 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
         {/* メニューヘッダ */}
         <div className={'header'}>
           <div className={'header-inner'}>
-            <Accordion>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
-                <Typography>Menu</Typography>
+            <div onClick={(e) => e.preventDefault()}>
+              <TextField onChange={changeSearchWord} placeholder={'検索ワード'} />
+            </div>
+
+            {/* <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               </AccordionSummary>
-              <AccordionDetails>
-                {/* 登録 */}
-                <div>
-                  <Button variant={'contained'} className={'registButton'} onClick={editCard(undefined)} style={{ width: 'calc(100% - 20px)', margin: 10 }}>
-                    登録
-                  </Button>
-                </div>
-                <div>(フィルタとかソートとか置きたい)</div>
-              </AccordionDetails>
-            </Accordion>
+              <AccordionDetails>フィルターとか</AccordionDetails>
+            </Accordion> */}
           </div>
         </div>
 
         {/* リスト */}
-        <div className="content">{dispCardList.length > 0 ? dispCardList.map(createImgCardList) : 'Menuから登録してね'}</div>
+        <div className="content">{dispCardList.length > 0 ? dispCardList.map(createImgCardList) : 'フォームから登録してね'}</div>
       </div>
 
       {/* カード表示モーダル */}
       <Modal open={cardModalOpen} modalClose={closeModal}>
         <Paper>
-          <div style={{ backgroundImage: openCard.hasImage ? `url(${imageMap[openCard.id]})` : '', backgroundSize: 'cover', backgroundPositionX: 'center' }}>
-            <div className={'modalInner'} style={{ backgroundColor: 'rgba(0, 0, 0, 0.4)', height: 400 }}>
+          <div
+            style={{
+              backgroundImage: `url(${openCard.img})`,
+              backgroundSize: 'cover',
+              backgroundPositionX: 'center',
+              backgroundRepeat: 'no-repeat',
+            }}
+          >
+            <div className={'modalInner'}>
               <div style={{ float: 'right' }}>
                 <button className={'closeButton'} onClick={closeModal}>
                   x
@@ -233,45 +154,27 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
                   <Typography className={props.theme === 'light' ? 'bokashi' : 'bokashiDark'}>{openCard.name}</Typography>
                 </div>
               </div>
-              <div style={{ position: 'fixed', bottom: 10 }}>
-                <Button variant={'contained'} color={'error'} onClick={clickDeleteCard} style={{ marginRight: 10 }}>
-                  削除
-                </Button>
-                <Button variant={'contained'} color={'info'} onClick={editCard(openCard)}>
-                  編集
-                </Button>
-              </div>
-            </div>
-          </div>
-        </Paper>
-      </Modal>
+              {/* 説明とか */}
+              <div>
+                <Typography className={props.theme === 'light' ? 'bokashi' : 'bokashiDark'} style={{ fontSize: 'small', marginTop: 10 }}>
+                  コーデ
+                </Typography>
+                <Typography className={props.theme === 'light' ? 'bokashi' : 'bokashiDark'}>{openCard.coordinate}</Typography>
+                <Typography className={props.theme === 'light' ? 'bokashi' : 'bokashiDark'} style={{ fontSize: 'small', marginTop: 10 }}>
+                  ひとこと
+                </Typography>
+                <Typography className={props.theme === 'light' ? 'bokashi' : 'bokashiDark'}>{openCard.comment}</Typography>
 
-      {/* 登録モーダル */}
-      <Modal open={registerModalOpen} modalClose={closeModal}>
-        <Paper>
-          <div className={'modalInner'} style={{ height: '80vh' }}>
-            <div style={{ float: 'right' }}>
-              <button className={'closeButton'} onClick={closeModal}>
-                x
-              </button>
-            </div>
-            <div style={{ marginTop: 50 }}>
-              <div>なまえ</div>
-              <TextField variant={'filled'} id="card_name" defaultValue={openCard.name} fullWidth={true} />
-            </div>
-            <div>
-              <div>QR</div>
-              <TextField variant={'filled'} id="card_qr" defaultValue={openCard.qr} rows={5} fullWidth={true} />
-            </div>
-            <div>
-              <div>画像</div>
-              <input type={'file'} id="card_image" accept="image/*" onChange={uploadImage} />
-              {openCard.hasImage && <img style={{ maxHeight: '20vh' }} src={imageMap[openCard.id]} />}
-            </div>
-            <div style={{ marginTop: 50 }}>
-              <Button variant={'contained'} color={'success'} onClick={registCard}>
-                {registerModalMode === 0 ? '登録' : '更新'}
-              </Button>
+                <div style={{ marginTop: 30 }}>
+                  {openCard.tags.map((tag, index) => {
+                    return (
+                      <Button key={index} style={{ margin: 5, letterSpacing: 0, padding: `1px 3px 1px 3px` }} variant={'contained'} color={'info'}>
+                        #{tag}
+                      </Button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </div>
         </Paper>
@@ -292,8 +195,6 @@ const mapStateToProps = (state: RootState) => {
 // action
 const mapDispatchToProps = {
   changeNotify: actions.changeNotify,
-  postFriendCard: actions.postFriendCard,
-  deleteFriendCardConfirm: actions.deleteFriendCardConfirm,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

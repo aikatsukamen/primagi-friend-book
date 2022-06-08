@@ -1,13 +1,26 @@
-import { action, ActionType, getType } from 'typesafe-actions';
+import { ActionType, getType } from 'typesafe-actions';
 import * as actions from '../actions';
 import customTheme from '../theme';
 import { Theme } from '@mui/material';
 import { Card } from '../types/global';
 type Action = ActionType<typeof actions>;
 
-export type ContentState = {
-  cardList: Card[];
+export enum SortType {
+  CREATE_TIME_ASC,
+  CREATE_TIME_DESC,
+  NAME_ASC,
+  NAME_DESC,
+}
 
+export type ContentState = {
+  /** カードリスト */
+  cardList: Card[];
+  /** お気に入りQRリスト */
+  favList: {
+    [qr: string]: number;
+  };
+  /** ソート種別 */
+  sortType: SortType;
   theme: {
     mode: 'light' | 'dark';
     theme: Theme;
@@ -23,12 +36,14 @@ export type ContentState = {
   };
 };
 
-const initial: ContentState = {
+export const initial: ContentState = {
+  cardList: [],
+  favList: {},
+  sortType: SortType.CREATE_TIME_ASC,
   theme: {
     mode: 'light',
     theme: customTheme('light'),
   },
-  cardList: [],
   reader: {
     timer: 0,
   },
@@ -60,22 +75,10 @@ const reducer = (state: ContentState = initial, action: Action): ContentState =>
       };
     }
 
-    case getType(actions.postFriendCard): {
-      let list: typeof state.cardList = JSON.parse(JSON.stringify(state.cardList));
-      list = list.filter((item) => item.id !== action.payload.id);
-      list.push(action.payload);
+    case getType(actions.updateCardList): {
       return {
         ...state,
-        cardList: list,
-      };
-    }
-
-    case getType(actions.deleteFriendCard): {
-      let list: typeof state.cardList = JSON.parse(JSON.stringify(state.cardList));
-      list = list.filter((item) => item.id !== action.payload);
-      return {
-        ...state,
-        cardList: list,
+        cardList: action.payload,
       };
     }
 

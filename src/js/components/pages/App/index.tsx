@@ -48,12 +48,12 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
   const classes = useStyles(props.theme);
   const tabs = [
     {
-      label: 'カードリスト',
-      icon: <ListIcon />,
-    },
-    {
       label: 'QRリーダー',
       icon: <CameraIcon />,
+    },
+    {
+      label: 'カードリスト',
+      icon: <ListIcon />,
     },
     {
       label: '設定',
@@ -65,8 +65,8 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
       <Paper className={classes.root}>
         <div className={'SW-update-dialog'} />
         <NavTabs tabs={tabs} style={{ top: 0 }}>
-          <QrList />
           <QrReader />
+          <QrList />
           <Setting />
         </NavTabs>
       </Paper>
