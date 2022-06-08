@@ -10,7 +10,7 @@ import { Color } from './Color';
  */
 export const fetchJson = async <T>(url: string): Promise<T> => {
   try {
-    const result = await fetch(url);
+    const result = await fetch(url, { cache: 'no-store' });
     const config = await result.json();
     return config as T;
   } catch (e) {
