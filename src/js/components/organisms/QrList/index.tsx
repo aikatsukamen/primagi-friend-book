@@ -107,9 +107,11 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
         {/* メニューヘッダ */}
         <div className={'header'}>
           <div className={'header-inner'}>
-            <div onClick={(e) => e.preventDefault()}>
-              <TextField onChange={changeSearchWord} placeholder={'検索ワード'} />
-            </div>
+            <Paper>
+              <div onClick={(e) => e.preventDefault()}>
+                <TextField onChange={changeSearchWord} placeholder={'検索ワード'} />
+              </div>
+            </Paper>
 
             {/* <Accordion>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
