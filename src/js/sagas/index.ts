@@ -12,7 +12,7 @@ export default function* rootSaga() {
 
 function* initDB() {
   try {
-    const json: Card[] = yield call(fetchJson, 'https://raw.githubusercontent.com/aikatsukamen/primagi-friend-data/main/friend_card.json?t=' + new Date().getTime());
+    const json: Card[] = yield call(fetchJson, 'https://aikatsukamen.github.io/primagi-friend-data/friend_card.json?t=' + new Date().getTime());
     yield put(actions.updateCardList(json));
   } catch (e) {
     yield call(errorHandler, e);
