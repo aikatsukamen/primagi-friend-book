@@ -1,8 +1,6 @@
-import { select, call, put, take, takeEvery, race } from 'redux-saga/effects';
+import { call, put } from 'redux-saga/effects';
 import * as actions from '../actions';
-import { alertSaga, confirmSaga } from './dialog';
-import { RootState } from '../reducers';
-import { Card, GeneratorType } from '../types/global';
+import { Card } from '../types/global';
 import { fetchJson } from './common';
 
 export default function* rootSaga() {
@@ -12,8 +10,11 @@ export default function* rootSaga() {
 
 function* initDB() {
   try {
-    const json: Card[] = yield call(fetchJson, 'https://aikatsukamen.github.io/primagi-friend-data/friend_card.json?t=' + new Date().getTime());
+    let json: Card[] = yield call(fetchJson, 'https://aikatsukamen.github.io/primagi-friend-data/friend_card.json?t=' + new Date().getTime());
     yield put(actions.updateCardList(json));
+
+    json = yield call(fetchJson, 'https://aikatsukamen.github.io/primagi-friend-data/mychara.json?t=' + new Date().getTime());
+    yield put(actions.updateMycharaList(json));
   } catch (e) {
     yield call(errorHandler, e);
   }

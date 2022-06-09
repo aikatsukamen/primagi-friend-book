@@ -70,3 +70,13 @@ const UPDATE_CARD_LIST = 'UPDATE_CARD_LIST';
 export const updateCardList = createAction(UPDATE_CARD_LIST, (action) => {
   return (cardList: Card[]) => action(cardList);
 });
+
+const UPDATE_MYCHARA_LIST = 'UPDATE_MYCHARA_LIST';
+export const updateMycharaList = createAction(UPDATE_MYCHARA_LIST, (action) => {
+  return (cardList: Card[]) => action(cardList);
+});
+
+const UPDATE_MYCHARA_IGNORE_LIST = 'UPDATE_MYCHARA_IGNORE_LIST';
+export const updateMycharaIgnoreList = createAction(UPDATE_MYCHARA_IGNORE_LIST, (action) => {
+  return (nameList: string[]) => action(nameList);
+});

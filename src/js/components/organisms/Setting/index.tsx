@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { makeStyles } from '@mui/styles';
 import * as actions from '../../../actions';
 import { RootState } from '../../../reducers';
-import { Button, Divider, FormControl, FormControlLabel, Radio, RadioGroup, Slider, Stack, Typography } from '@mui/material';
+import { Button, Divider, FormControl, FormControlLabel, Radio, RadioGroup, Slider, Stack, TextField, Typography } from '@mui/material';
 import customTheme from '../../../theme';
 import Qrcode from '../../molecules/Qrcode';
 
@@ -49,6 +49,18 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
     setthemeMode(event.target.value);
     console.log(event.target.value);
     props.updateTheme(event.target.value);
+  };
+
+  const [ignoreList, setIgnoreList] = React.useState<string>('');
+  useEffect(() => {
+    setIgnoreList(props.ignoreList.join('\n'));
+  }, [JSON.stringify(props.ignoreList)]);
+  const changeIgnoreList = (e: any) => {
+    setIgnoreList(e.target.value);
+  };
+  const applyIgnoreList = () => {
+    const newList = ignoreList.split(/\n/).filter((item) => item);
+    props.updateIgnoreList(newList);
   };
 
   const createQrCode = () => {
@@ -156,6 +168,15 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
           </RadioGroup>
         </FormControl>
       </div>
+
+      {/* 無視リスト */}
+      <div className={classes.content}>
+        <Typography variant="h6">非表示キャラ名</Typography>
+        <TextField multiline={true} maxRows={5} value={ignoreList} onChange={changeIgnoreList} fullWidth={true} style={{ width: '80vw', display: 'block' }} />
+        <Button onClick={applyIgnoreList} disabled={props.ignoreList.join('\n') === ignoreList} variant="contained" color={'info'}>
+          反映
+        </Button>
+      </div>
     </div>
   );
 };
@@ -165,6 +186,7 @@ const mapStateToProps = (state: RootState) => {
   return {
     qrsize: state.content.displaySetting.qrSize,
     theme: state.content.theme,
+    ignoreList: state.content.ignoreCharaList,
   };
 };
 
@@ -173,6 +195,7 @@ const mapDispatchToProps = {
   updateTheme: actions.updateTheme,
   changeNotify: actions.changeNotify,
   updateQrSize: actions.updateDispQr,
+  updateIgnoreList: actions.updateMycharaIgnoreList,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

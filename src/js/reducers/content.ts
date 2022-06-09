@@ -15,6 +15,8 @@ export enum SortType {
 export type ContentState = {
   /** カードリスト */
   cardList: Card[];
+  /** マイキャラごとに1枚ずつ抜き出したリスト */
+  mycharaList: Card[];
   /** お気に入りQRリスト */
   favList: {
     [qr: string]: number;
@@ -25,6 +27,8 @@ export type ContentState = {
     mode: 'light' | 'dark';
     theme: Theme;
   };
+  /** リストから除外するリスト */
+  ignoreCharaList: string[];
 
   reader: {
     timer: number;
@@ -38,6 +42,8 @@ export type ContentState = {
 
 export const initial: ContentState = {
   cardList: [],
+  mycharaList: [],
+  ignoreCharaList: [],
   favList: {},
   sortType: SortType.CREATE_TIME_ASC,
   theme: {
@@ -79,6 +85,20 @@ const reducer = (state: ContentState = initial, action: Action): ContentState =>
       return {
         ...state,
         cardList: action.payload,
+      };
+    }
+
+    case getType(actions.updateMycharaList): {
+      return {
+        ...state,
+        mycharaList: action.payload,
+      };
+    }
+
+    case getType(actions.updateMycharaIgnoreList): {
+      return {
+        ...state,
+        ignoreCharaList: action.payload,
       };
     }
 
