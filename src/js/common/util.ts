@@ -1,5 +1,4 @@
-import { saveAs } from 'file-saver';
-import QRCode, { QRCodeRenderersOptions } from 'qrcode';
+import { QRCodeRenderersOptions } from 'qrcode';
 import React from 'react';
 
 /** バイナリの16進数文字列をバイト列にする */
@@ -24,56 +23,6 @@ export const binStrToByte = (str: string): number[] => {
   return result;
 };
 
-/** 配列を指定した個数の単位で分割 */
-const chunk = <T>(array: T[], size: number): T[][] => {
-  const chunked: T[][] = [];
-
-  for (const element of array) {
-    const last = chunked[chunked.length - 1];
-
-    if (!last || last.length === size) {
-      chunked.push([element]);
-    } else {
-      last.push(element);
-    }
-  }
-
-  return chunked;
-};
-
-/**
- * CORS回避画像の取得
- * cacheに残ってればその画像を、そうでなければリクエストして画像を取得する
- */
-const fetchPngImageAvoidCors = async (imageurl: string) => {
-  console.log(`[fetchPngImageAvoidCors] ${imageurl}`);
-  const cache = sessionStorage.getItem(`${imageurl}`);
-  let isNeedGet = true;
-  if (cache) {
-    try {
-      const init: RequestInit = {
-        referrerPolicy: 'no-referrer',
-      };
-      await fetch(cache, init);
-      isNeedGet = false;
-    } catch (e) {
-      // キャッシュリストにはあるんだけど何か取れなかった
-      console.log('blobに無いので再取得: ' + imageurl);
-    }
-  }
-  if (isNeedGet) {
-    const res = await fetch(imageurl);
-    const buf = await res.arrayBuffer();
-    const blob = new Blob([buf], { type: 'image/png' });
-    const url = URL.createObjectURL(blob);
-
-    sessionStorage.setItem(imageurl, url);
-    return url;
-  } else {
-    return cache as string;
-  }
-};
-
 export type ReactQRCodeProps = {
   text?: string;
   data?: number[];
@@ -83,71 +32,6 @@ export type ReactQRCodeProps = {
   backgroundRotate: boolean;
   options?: QRCodeRenderersOptions;
   tagType?: 'canvas' | 'img';
-};
-
-const qr2Image = async (data: string | number[], options: QRCodeRenderersOptions) => {
-  let dataUrl = '';
-  if (typeof data === 'string') {
-    // テキストモード
-    dataUrl = await new Promise((resolve) => {
-      QRCode.toDataURL(data, options, (error: any, url: string) => {
-        if (error) {
-          throw error;
-        }
-        resolve(url);
-      });
-    });
-  } else if (data) {
-    // Byteモード
-    dataUrl = await new Promise((resolve) => {
-      QRCode.toDataURL([{ data: new Uint8ClampedArray(data), mode: 'byte' }], options, function (error: any, url: string) {
-        if (error) {
-          throw error;
-        }
-        resolve(url);
-      });
-    });
-  }
-
-  const qrImage = new Image();
-  qrImage.src = dataUrl;
-  return qrImage;
-};
-
-const loadImage = async (image: HTMLImageElement) => {
-  await new Promise<void>((resolve) => {
-    image.onload = () => {
-      resolve();
-    };
-    image.onerror = () => {
-      console.warn('読み込み失敗');
-      resolve();
-    };
-  });
-};
-
-const canvas2Blob = async (canvas: HTMLCanvasElement, type?: string, quality?: number): Promise<Blob> => {
-  const imageType = type ?? 'image/png';
-  const imageQuality = quality ?? 0.9;
-
-  return new Promise((resolve) => {
-    canvas.toBlob(
-      (blob) => {
-        if (blob) {
-          resolve(blob);
-        } else {
-          throw 'canvasがblobにできなかった';
-        }
-      },
-      imageType,
-      imageQuality,
-    );
-  });
-};
-
-/** blobをダウンロードする */
-export const downloadBlob = (blob: Blob, filename: string) => {
-  saveAs(blob, filename);
 };
 
 export function useDelayedEffect(effect: React.EffectCallback, deps: React.DependencyList, timeout = 1000) {
@@ -176,4 +60,21 @@ export const stopRecogQR = () => {
   } catch (e) {
     // ビデオがまだ無いときとかにここに来るが、気にしない
   }
+};
+
+export const yyyymmdd = (dateStr: string) => {
+  const date = new Date(dateStr);
+  const year = date.getFullYear();
+  const month = `00${date.getMonth() + 1}`.slice(-2);
+  const day = `00${date.getDate()}`.slice(-2);
+  return `${year}/${month}/${day}`;
+};
+
+export const isNew = (dateStr: string) => {
+  const target = new Date(dateStr);
+  target.setHours(0, 0, 0, 0);
+  const today = new Date();
+  today.setDate(today.getDate() - 3);
+  today.setHours(0, 0, 0, 0);
+  return target.getTime() - today.getTime() > 0;
 };

@@ -185,3 +185,9 @@ select {
   letter-spacing: 6px;
   text-shadow: 3px 3px 3px #000000, -3px 3px 3px #000000, 3px -3px 3px #000000, -3px -3px 3px #000000, 3px 0px 3px #000000, 0px 3px 3px #000000, -3px 0px 3px #000000, 0px -3px 3px #000000;
 }
+
+.newIcon {
+  position: absolute;
+  top: 0;
+  right: 0;
+}

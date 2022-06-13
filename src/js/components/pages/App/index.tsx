@@ -7,7 +7,7 @@ import Setting from '../../organisms/Setting';
 import ListIcon from '@mui/icons-material/List';
 import CameraIcon from '@mui/icons-material/QrCode2';
 import SettingIcon from '@mui/icons-material/Settings';
-import { Modal, Paper, Theme, ThemeProvider } from '@mui/material';
+import { Paper, Theme, ThemeProvider } from '@mui/material';
 import { RootState } from '../../../reducers';
 import { connect } from 'react-redux';
 import customTheme from '../../../theme';

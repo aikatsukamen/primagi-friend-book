@@ -6,7 +6,7 @@ import { RootState } from '../../../reducers';
 import { Accordion, AccordionDetails, AccordionSummary, Button, Paper, TextField, Typography } from '@mui/material';
 import { Card } from '../../../types/global';
 import Modal from '../../molecules/Modal';
-import { binStrToByte } from '../../../common/util';
+import { binStrToByte, isNew, yyyymmdd } from '../../../common/util';
 import Qrcode from '../../molecules/Qrcode';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import CloseIcon from '@mui/icons-material/Close';
@@ -159,6 +159,7 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
     return (
       <button key={key} className={'qritem'} onClick={isMyCharaList ? addNameTag(card.name) : clickCard(card)}>
         <Paper style={{ transform: 'translate(-50%, 0)', left: '50%', position: 'relative' }}>
+          {!isMyCharaList && isNew(card.timestamp) ? <img className="newIcon" src="./img/icon_new.png" width={64} /> : ''}
           <img
             style={{ objectFit: 'contain' }}
             src={card.img}
@@ -312,6 +313,12 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
                   ''
                 )}
 
+                <Typography className={props.theme === 'light' ? 'bokashi' : 'bokashiDark'} style={{ fontSize: 'small', marginTop: 10 }}>
+                  登録日
+                </Typography>
+                <Typography className={props.theme === 'light' ? 'bokashi' : 'bokashiDark'}>{yyyymmdd(openCard.timestamp)}</Typography>
+
+                {/* タグ */}
                 <div style={{ marginTop: 30 }}>
                   {/* username */}
                   <Button
