@@ -3,13 +3,14 @@ import { connect } from 'react-redux';
 import { makeStyles } from '@mui/styles';
 import * as actions from '../../../actions';
 import { RootState } from '../../../reducers';
-import { Accordion, AccordionDetails, AccordionSummary, Button, CircularProgress, Paper, TextField, Typography } from '@mui/material';
+import { Button, CircularProgress, Paper, TextField, Typography } from '@mui/material';
 import { Card } from '../../../types/global';
 import Modal from '../../molecules/Modal';
 import { binStrToByte, isNew, yyyymmdd } from '../../../common/util';
 import Qrcode from '../../molecules/Qrcode';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import CloseIcon from '@mui/icons-material/Close';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 const useStyles = () =>
   makeStyles({
@@ -27,10 +28,10 @@ const initCard: Card = { comment: '', coordinate: '', img: '', name: '', qr: '',
 
 const App: React.SFC<PropsType> = (props: PropsType) => {
   const classes = useStyles();
-  const [isLoading, setIsLoading] = React.useState(true);
-
   const [cardModalOpen, setcardModalOpen] = React.useState(false);
   const [openCard, setOpenCard] = React.useState<Card>(initCard);
+  const [cardBackgroundVisiblity, setCardBackgroundVisiblity] = React.useState(true);
+
   // 表示対象のカード
   const [dispCardList, setDispCardList] = React.useState<Card[]>([]);
   // ワード検索
@@ -104,29 +105,38 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
   const closeModal = () => {
     setcardModalOpen(false);
     setOpenCard(initCard);
+    setCardBackgroundVisiblity(true);
   };
 
   /** カード開く */
   const clickCard = (card: Card) => () => {
     console.log(`clickCard ` + JSON.stringify(card, null, '  '));
     setOpenCard(card);
+    setCardBackgroundVisiblity(true);
     setcardModalOpen(true);
+  };
+  /** カードのモーダルで背景だけ表示 */
+  const clickCardBackgroundVisiblity = () => {
+    setCardBackgroundVisiblity(!cardBackgroundVisiblity);
   };
 
   const addNameTag = (name: string) => () => {
     if (!dispNameTags.includes(name)) {
       setDispNameTags([...dispNameTags, name]);
     }
+    closeModal();
   };
   const addUserNameTag = (name: string) => () => {
     if (!dispUserNameTags.includes(name)) {
       setUserNameDispTags([...dispUserNameTags, name]);
     }
+    closeModal();
   };
   const addGeneralTag = (name: string) => () => {
     if (!dispGeneralTags.includes(name)) {
-      return setGeneralDispTags([...dispGeneralTags, name]);
+      setGeneralDispTags([...dispGeneralTags, name]);
     }
+    closeModal();
   };
   const deleteNameTag = (name: string) => () => {
     setDispNameTags(dispNameTags.filter((tag) => tag !== name));
@@ -135,7 +145,7 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
     setUserNameDispTags(dispUserNameTags.filter((tag) => tag !== name));
   };
   const deleteGeneralTag = (name: string) => () => {
-    return setGeneralDispTags(dispGeneralTags.filter((tag) => tag !== name));
+    setGeneralDispTags(dispGeneralTags.filter((tag) => tag !== name));
   };
 
   const createImgCardList = () => {
@@ -279,78 +289,87 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
               backgroundRepeat: 'no-repeat',
             }}
           >
-            <div className={'modalInner'}>
+            <div className={'modalInner'} style={{ backgroundColor: cardBackgroundVisiblity ? undefined : 'initial' }}>
               <div style={{ float: 'right' }}>
                 <button className={'closeButton'} onClick={closeModal}>
                   x
                 </button>
               </div>
-              <div style={{ textAlign: 'center' }}>
-                <Qrcode
-                  data={binStrToByte(openCard.qr)}
-                  options={{
-                    errorCorrectionLevel: 'M',
-                    margin: 2,
-                    width: props.qrSize,
-                  }}
-                  tagType={'img'}
-                />
-                <div>
-                  <Typography className={props.theme === 'light' ? 'bokashi' : 'bokashiDark'}>{openCard.name}</Typography>
-                </div>
+              <div style={{ float: 'left' }} onClick={clickCardBackgroundVisiblity}>
+                {cardBackgroundVisiblity ? <VisibilityIcon /> : <VisibilityOffIcon />}
               </div>
-              {/* 説明とか */}
-              <div>
-                <Typography className={props.theme === 'light' ? 'bokashi' : 'bokashiDark'} style={{ fontSize: 'small', marginTop: 10 }}>
-                  コーデ
-                </Typography>
-                <Typography className={props.theme === 'light' ? 'bokashi' : 'bokashiDark'}>{openCard.coordinate}</Typography>
-                {openCard.comment ? (
-                  <>
+              {cardBackgroundVisiblity ? (
+                <>
+                  <div style={{ textAlign: 'center' }}>
+                    <Qrcode
+                      data={binStrToByte(openCard.qr)}
+                      options={{
+                        errorCorrectionLevel: 'M',
+                        margin: 2,
+                        width: props.qrSize,
+                      }}
+                      tagType={'img'}
+                    />
+                    <div>
+                      <Typography className={props.theme === 'light' ? 'bokashi' : 'bokashiDark'}>{openCard.name}</Typography>
+                    </div>
+                  </div>
+
+                  <div>
                     <Typography className={props.theme === 'light' ? 'bokashi' : 'bokashiDark'} style={{ fontSize: 'small', marginTop: 10 }}>
-                      ひとこと
+                      コーデ
                     </Typography>
-                    <Typography className={props.theme === 'light' ? 'bokashi' : 'bokashiDark'}>{openCard.comment}</Typography>
-                  </>
-                ) : (
-                  ''
-                )}
+                    <Typography className={props.theme === 'light' ? 'bokashi' : 'bokashiDark'}>{openCard.coordinate}</Typography>
+                    {openCard.comment ? (
+                      <>
+                        <Typography className={props.theme === 'light' ? 'bokashi' : 'bokashiDark'} style={{ fontSize: 'small', marginTop: 10 }}>
+                          ひとこと
+                        </Typography>
+                        <Typography className={props.theme === 'light' ? 'bokashi' : 'bokashiDark'}>{openCard.comment}</Typography>
+                      </>
+                    ) : (
+                      ''
+                    )}
 
-                <Typography className={props.theme === 'light' ? 'bokashi' : 'bokashiDark'} style={{ fontSize: 'small', marginTop: 10 }}>
-                  登録日
-                </Typography>
-                <Typography className={props.theme === 'light' ? 'bokashi' : 'bokashiDark'}>{yyyymmdd(openCard.timestamp)}</Typography>
+                    <Typography className={props.theme === 'light' ? 'bokashi' : 'bokashiDark'} style={{ fontSize: 'small', marginTop: 10 }}>
+                      登録日
+                    </Typography>
+                    <Typography className={props.theme === 'light' ? 'bokashi' : 'bokashiDark'}>{yyyymmdd(openCard.timestamp)}</Typography>
 
-                {/* タグ */}
-                <div style={{ marginTop: 30 }}>
-                  {/* username */}
-                  <Button
-                    key={'username'}
-                    style={{ margin: 5, letterSpacing: 0, padding: `1px 3px 1px 3px` }}
-                    variant={'contained'}
-                    color={'success'}
-                    onClick={addUserNameTag(openCard.username)}
-                  >
-                    #{openCard.username}
-                  </Button>
-                  <Button
-                    key={'name'}
-                    style={{ margin: 5, letterSpacing: 0, padding: `1px 3px 1px 3px` }}
-                    variant={'contained'}
-                    color={'error'}
-                    onClick={addNameTag(openCard.name)}
-                  >
-                    #{openCard.name}
-                  </Button>
-                  {openCard.tags.map((tag, index) => {
-                    return (
-                      <Button key={index} style={{ margin: 5, letterSpacing: 0, padding: `1px 3px 1px 3px` }} variant={'contained'} color={'info'} onClick={addGeneralTag(tag)}>
-                        #{tag}
+                    {/* タグ */}
+                    <div style={{ marginTop: 30 }}>
+                      {/* username */}
+                      <Button
+                        key={'username'}
+                        style={{ margin: 5, letterSpacing: 0, padding: `1px 3px 1px 3px` }}
+                        variant={'contained'}
+                        color={'success'}
+                        onClick={addUserNameTag(openCard.username)}
+                      >
+                        #{openCard.username}
                       </Button>
-                    );
-                  })}
-                </div>
-              </div>
+                      <Button
+                        key={'name'}
+                        style={{ margin: 5, letterSpacing: 0, padding: `1px 3px 1px 3px` }}
+                        variant={'contained'}
+                        color={'error'}
+                        onClick={addNameTag(openCard.name)}
+                      >
+                        #{openCard.name}
+                      </Button>
+                      {openCard.tags.map((tag, index) => {
+                        return (
+                          <Button key={index} style={{ margin: 5, letterSpacing: 0, padding: `1px 3px 1px 3px` }} variant={'contained'} color={'info'} onClick={addGeneralTag(tag)}>
+                            #{tag}
+                          </Button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                ''
+              )}
             </div>
           </div>
         </Paper>
