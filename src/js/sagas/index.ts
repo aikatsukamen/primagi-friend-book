@@ -15,6 +15,7 @@ function* initDB() {
 
     json = yield call(fetchJson, 'https://aikatsukamen.github.io/primagi-friend-data/mychara.json?t=' + new Date().getTime());
     yield put(actions.updateMycharaList(json));
+    yield put(actions.updateStatus('ok'));
   } catch (e) {
     yield call(errorHandler, e);
   }

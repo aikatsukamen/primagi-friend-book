@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { makeStyles } from '@mui/styles';
 import * as actions from '../../../actions';
 import { RootState } from '../../../reducers';
-import { Accordion, AccordionDetails, AccordionSummary, Button, Paper, TextField, Typography } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, Button, CircularProgress, Paper, TextField, Typography } from '@mui/material';
 import { Card } from '../../../types/global';
 import Modal from '../../molecules/Modal';
 import { binStrToByte, isNew, yyyymmdd } from '../../../common/util';
@@ -27,6 +27,8 @@ const initCard: Card = { comment: '', coordinate: '', img: '', name: '', qr: '',
 
 const App: React.SFC<PropsType> = (props: PropsType) => {
   const classes = useStyles();
+  const [isLoading, setIsLoading] = React.useState(true);
+
   const [cardModalOpen, setcardModalOpen] = React.useState(false);
   const [openCard, setOpenCard] = React.useState<Card>(initCard);
   // 表示対象のカード
@@ -245,9 +247,9 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
         {/* メニューヘッダ */}
         <div className={'header'}>
           <div className={'header-inner'}>
-            <Paper>
+            <Paper style={{ margin: 5, width: '95vw' }}>
               <div onClick={(e) => e.preventDefault()}>
-                <TextField onChange={changeSearchWord} placeholder={'検索ワード'} />
+                <TextField onChange={changeSearchWord} placeholder={'検索ワード'} fullWidth={true} />
               </div>
             </Paper>
 
@@ -263,6 +265,7 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
         {dispNameTags.length === 0 && dispUserNameTags.length === 0 ? <div style={{ margin: 2 }}>表示するキャラを選んでね</div> : ''}
         {createDispTagList()}
         <div className="content">{createImgCardList()}</div>
+        <div style={{ float: 'right', marginTop: -50, marginRight: 20, bottom: 0, position: 'sticky' }}>{props.status === 'processing' ? <CircularProgress /> : ''}</div>
       </div>
 
       {/* カード表示モーダル */}
@@ -359,6 +362,7 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
 // state
 const mapStateToProps = (state: RootState) => {
   return {
+    status: state.notify.status,
     cardList: state.content.cardList,
     mycharaList: state.content.mycharaList,
     ignoreList: state.content.ignoreCharaList,

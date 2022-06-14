@@ -17,7 +17,7 @@ export type DialogState = {
 };
 
 export type NotifyState = {
-  status: 'initialzing' | 'uploading' | 'posting' | 'ok' | 'error';
+  status: 'processing' | 'ok' | 'error';
   /** 通知欄 */
   notify: {
     /** 表示可否 */
@@ -34,7 +34,7 @@ export type NotifyState = {
 };
 
 export const initial: NotifyState = {
-  status: 'ok',
+  status: 'processing',
   // 通知欄
   notify: {
     show: false,
