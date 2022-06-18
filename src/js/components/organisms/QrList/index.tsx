@@ -39,6 +39,21 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
   const changeSearchWord: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     setSearchWord(e.target.value);
   };
+  // ソート
+  enum SortType {
+    CHARA_NAME_ASC,
+    CHARA_NAME_DESC,
+    TIMESTAMP_ASC,
+    TIMESTAMP_DESC,
+  }
+  const [sortType, setSortType] = React.useState<SortType>(SortType.CHARA_NAME_ASC);
+  const changeSortType = () => {
+    if (sortType >= 3) {
+      setSortType(0);
+    } else {
+      setSortType(sortType + 1);
+    }
+  };
 
   // タグ
   const [dispNameTags, setDispNameTags] = React.useState<string[]>([]);
@@ -99,8 +114,44 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
       return false;
     });
 
+    // ソート
+    switch (sortType) {
+      case SortType.CHARA_NAME_ASC: {
+        newDispCardList = newDispCardList.sort((a, b) => {
+          if (a.name > b.name) return 1;
+          if (a.name < b.name) return -1;
+          return 0;
+        });
+        break;
+      }
+      case SortType.CHARA_NAME_DESC: {
+        newDispCardList = newDispCardList.sort((a, b) => {
+          if (a.name > b.name) return -1;
+          if (a.name < b.name) return 1;
+          return 0;
+        });
+        break;
+      }
+      case SortType.TIMESTAMP_ASC: {
+        newDispCardList = newDispCardList.sort((a, b) => {
+          if (a.timestamp > b.timestamp) return 1;
+          if (a.timestamp < b.timestamp) return -1;
+          return 0;
+        });
+        break;
+      }
+      case SortType.TIMESTAMP_DESC: {
+        newDispCardList = newDispCardList.sort((a, b) => {
+          if (a.timestamp > b.timestamp) return -1;
+          if (a.timestamp < b.timestamp) return 1;
+          return 0;
+        });
+        break;
+      }
+    }
+
     setDispCardList(newDispCardList);
-  }, [searchWord, JSON.stringify(dispNameTags), JSON.stringify(dispGeneralTags), JSON.stringify(dispUserNameTags)]);
+  }, [searchWord, JSON.stringify(dispNameTags), JSON.stringify(dispGeneralTags), JSON.stringify(dispUserNameTags), sortType]);
 
   const closeModal = () => {
     setcardModalOpen(false);
@@ -122,7 +173,11 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
 
   const addNameTag = (name: string) => () => {
     if (!dispNameTags.includes(name)) {
-      setDispNameTags([...dispNameTags, name]);
+      if (name !== '全員' && dispNameTags.includes('全員')) {
+        setDispNameTags([...dispNameTags.filter((item) => item !== '全員'), name]);
+      } else {
+        setDispNameTags([...dispNameTags, name]);
+      }
     }
     closeModal();
   };
@@ -251,23 +306,35 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
     );
   };
 
+  const createSortButtonMsg = () => {
+    switch (sortType) {
+      case SortType.CHARA_NAME_ASC:
+        return 'キャラ名\n▲昇順';
+      case SortType.CHARA_NAME_DESC:
+        return 'キャラ名\n▼降順';
+      case SortType.TIMESTAMP_ASC:
+        return '登録日時\n▲昇順';
+      case SortType.TIMESTAMP_DESC:
+        return '登録日時\n▼降順';
+    }
+  };
+
   return (
     <>
       <div>
         {/* メニューヘッダ */}
         <div className={'header'}>
-          <div className={'header-inner'}>
-            <Paper style={{ margin: 5, width: '95vw' }}>
+          <div className={'header-inner'} style={{ display: 'grid', gridTemplateColumns: '1fr 65px', padding: 5 }}>
+            {/* 検索 */}
+            <Paper>
               <div onClick={(e) => e.preventDefault()}>
                 <TextField onChange={changeSearchWord} placeholder={'検索ワード'} fullWidth={true} />
               </div>
             </Paper>
-
-            {/* <Accordion>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              </AccordionSummary>
-              <AccordionDetails>フィルターとか</AccordionDetails>
-            </Accordion> */}
+            {/* ソート */}
+            <Button onClick={changeSortType} variant="contained" style={{ fontSize: 'small', padding: 0 }}>
+              {createSortButtonMsg()}
+            </Button>
           </div>
         </div>
 
