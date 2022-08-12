@@ -80,3 +80,25 @@ const UPDATE_MYCHARA_IGNORE_LIST = 'UPDATE_MYCHARA_IGNORE_LIST';
 export const updateMycharaIgnoreList = createAction(UPDATE_MYCHARA_IGNORE_LIST, (action) => {
   return (nameList: string[]) => action(nameList);
 });
+
+// デフォルトユーザー名を更新
+const UPDATE_DEFAULT_USERNAME = 'UPDATE_DEFAULT_USERNAME';
+export const updateDefaultUsername = createAction(UPDATE_DEFAULT_USERNAME, (action) => {
+  return (name: string) => action(name);
+});
+
+// マイキャラ名を更新
+const ADD_MYCHARA_NAME = 'ADD_MYCHARA_NAME';
+export const addMycharaName = createAction(ADD_MYCHARA_NAME, (action) => {
+  return (name: string) => action(name);
+});
+const DELETE_MYCHARA_NAME = 'DELETE_MYCHARA_NAME';
+export const deleteMycharaName = createAction(DELETE_MYCHARA_NAME, (action) => {
+  return (name: string) => action(name);
+});
+
+// // フォーム登録
+// const POST_FRIEND_CARD = 'POST_FRIEND_CARD';
+// export const updatePostFriendCard = createAction(POST_FRIEND_CARD, (action) => {
+//   return (obj: { username: string; name: string; coordiname: string; qr: string; imgUrl: string; comment: string; tags: string }) => action(obj);
+// });

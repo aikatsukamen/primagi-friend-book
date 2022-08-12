@@ -62,3 +62,9 @@ export const compColor = (baseColor: string) => {
   color.spin(180);
   return color.cssRGB();
 };
+
+export const binToStr = (qrData: { byte: number[]; data: string; version: number } | null): string => {
+  if (!qrData) return '';
+
+  return qrData.byte.map((item) => `00${item.toString(16)}`.slice(-2)).join('');
+};

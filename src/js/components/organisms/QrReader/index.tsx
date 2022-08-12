@@ -5,10 +5,11 @@ import * as actions from '../../../actions';
 import { RootState } from '../../../reducers';
 import jsQR from 'jsqr';
 import { QRCodeRenderersOptions } from 'qrcode';
-import { IconButton, MenuItem, Select, SelectChangeEvent, Typography } from '@mui/material';
+import { Button, IconButton, MenuItem, Select, SelectChangeEvent, TextField, Typography } from '@mui/material';
 import ClipboardIcon from '@mui/icons-material/ContentCopy';
 import Qrcode from '../../molecules/Qrcode';
 import { stopRecogQR } from '../../../common/util';
+import { binToStr } from '../../../sagas/common';
 
 const useStyles = () =>
   makeStyles({
@@ -28,6 +29,29 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
   const [deviceList, setDeviceList] = React.useState<MediaDeviceInfo[]>([]);
   const [renderDeviceId, setDeviceId] = React.useState(props.readerDeviceId);
   const [qrData, setQrData] = React.useState<{ byte: number[]; data: string; version: number } | null>(null);
+  const [isShowForm, setIsShowForm] = React.useState<boolean>(false);
+
+  const [mycharaname, setMycharaname] = React.useState('');
+  // const nameRef = React.useRef<HTMLSelectElement>();
+  const usernameRef = React.useRef<HTMLInputElement>();
+  // const coordinameRef = React.useRef<HTMLInputElement>();
+  // const imgurlRef = React.useRef<HTMLInputElement>();
+  // const commentRef = React.useRef<HTMLInputElement>();
+  // const tagRef = React.useRef<HTMLInputElement>();
+
+  const changeMycharaname = (event: SelectChangeEvent<string>, child: React.ReactNode) => {
+    setMycharaname(event.target.value);
+  };
+
+  const openForm = () => {
+    setIsShowForm(true);
+  };
+  const closeForm = () => {
+    setIsShowForm(false);
+    setQrData(null);
+
+    startRecogQr();
+  };
 
   useEffect(() => {
     startRecogQr();
@@ -123,6 +147,30 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
     }
   };
 
+  const clickPostForm = () => {
+    // const name = nameRef.current?.value ?? '';
+    const name = mycharaname;
+    const username = usernameRef.current?.value ?? '';
+    // const coordiname = coordinameRef.current?.value ?? '';
+    const qr = binToStr(qrData);
+    // const imgUrl = imgurlRef.current?.value ?? '';
+    // const comment = commentRef.current?.value ?? '';
+    // const tags = tagRef.current?.value ?? '';
+
+    const url = `https://docs.google.com/forms/d/e/1FAIpQLSfsg7oinHp22MDN1YUrUeRbNqPwv5AQ2icfLb99S6C2tvbbFQ/viewform?usp=pp_url&entry.50175958=${name}&entry.1947963319=${username}&entry.363804438=${qr}`;
+    window.open(url, '_blank');
+
+    // props.postForm({
+    //   username,
+    //   name,
+    //   coordiname,
+    //   qr,
+    //   imgUrl,
+    //   comment,
+    //   tags,
+    // });
+  };
+
   const createQrReader = () => {
     return (
       <div style={{ height: '100%' }}>
@@ -188,19 +236,71 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
 
         <div>
           <Typography variant="h5">バージョン</Typography>
-          <Typography variant="body1"> {version}</Typography>
+          <Typography variant="body1">{version}</Typography>
+        </div>
+
+        <div>
+          <Button variant="contained" color="inherit" style={{ margin: 10 }} onClick={closeForm}>
+            キャンセル
+          </Button>
+          <Button variant="contained" color="info" style={{ margin: 10 }} onClick={openForm}>
+            登録する
+          </Button>
         </div>
       </div>
     );
   };
 
-  return <div style={{ height: '100%', padding: 10 }}>{!qrData ? createQrReader() : createQrResult()}</div>;
+  const createQrPostForm = () => {
+    return (
+      <div>
+        <div>QR登録フォーム</div>
+        <div>
+          <div>所有者</div>
+          <TextField inputRef={usernameRef} defaultValue={props.defaultUsername} fullWidth={true} />
+        </div>
+        <div>
+          <div>マイキャラ名</div>
+          <Select fullWidth={true} value={mycharaname} onChange={changeMycharaname}>
+            <MenuItem key={'null'} value={''}>
+              {'-'}
+            </MenuItem>
+            {props.mycharanameList.map((item, index) => (
+              <MenuItem key={index} value={item}>
+                {item}
+              </MenuItem>
+            ))}
+          </Select>
+        </div>
+        <div>
+          <div>QRコード</div>
+          <TextField value={binToStr(qrData)} fullWidth={true} />
+        </div>
+        <div style={{ display: 'flex' }}>
+          <div style={{ margin: 10 }}>
+            <Button variant="contained" color={'inherit'} onClick={closeForm}>
+              キャンセル
+            </Button>
+          </div>
+          <div style={{ margin: 10 }}>
+            <Button variant="contained" onClick={clickPostForm}>
+              GoogleFormへ
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return <div style={{ height: '100%', padding: 10 }}>{!qrData ? createQrReader() : isShowForm ? createQrPostForm() : createQrResult()}</div>;
 };
 
 // state
 const mapStateToProps = (state: RootState) => {
   return {
     readerDeviceId: state.content.displaySetting.readerDeviceId,
+    defaultUsername: state.content.defaultUsername,
+    mycharanameList: state.content.mycharaNameList,
   };
 };
 
@@ -208,6 +308,7 @@ const mapStateToProps = (state: RootState) => {
 const mapDispatchToProps = {
   updateDeviceId: actions.updateReaderDevice,
   changeNotify: actions.changeNotify,
+  // postForm: actions.updatePostFriendCard,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { makeStyles } from '@mui/styles';
+import DeleteIcon from '@mui/icons-material/Delete';
 import * as actions from '../../../actions';
 import { RootState } from '../../../reducers';
-import { Button, Divider, FormControl, FormControlLabel, Radio, RadioGroup, Slider, Stack, TextField, Typography } from '@mui/material';
+import { Button, Divider, FormControl, FormControlLabel, IconButton, Paper, Radio, RadioGroup, Slider, Stack, TextField, Typography } from '@mui/material';
 import customTheme from '../../../theme';
 import Qrcode from '../../molecules/Qrcode';
 
@@ -61,6 +62,34 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
   const applyIgnoreList = () => {
     const newList = ignoreList.split(/\n/).filter((item) => item);
     props.updateIgnoreList(newList);
+  };
+
+  const [defaultUsername, setDefaultUsername] = React.useState<string>('');
+  useEffect(() => {
+    setDefaultUsername(props.defaultUsername);
+  }, [props.defaultUsername]);
+  const changeDefaultUsername = (e: any) => {
+    setDefaultUsername(e.target.value);
+  };
+  const applyDefaultUsername = () => {
+    props.updateDefaultUsername(defaultUsername);
+  };
+
+  const mycharaTxtRef = React.useRef<HTMLInputElement>();
+  const addMycharaname = () => {
+    const current = mycharaTxtRef.current;
+    if (current) {
+      const text = current.value;
+      if (!text || props.mycharaNameList.includes(text)) {
+        props.changeNotify(true, 'warning', '重複しない名前を入力してください');
+      } else {
+        props.addMycharaName(text);
+        current.value = '';
+      }
+    }
+  };
+  const deleteMycharaname = (text: string) => () => {
+    props.deleteMycharaName(text);
   };
 
   const createQrCode = () => {
@@ -177,6 +206,37 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
           反映
         </Button>
       </div>
+
+      {/* QR登録フォーム用 */}
+      <div className={classes.content}>
+        <Typography variant="h6">所有者名</Typography>
+        <TextField multiline={false} defaultValue={props.defaultUsername} onChange={changeDefaultUsername} fullWidth={true} style={{ width: '80vw', display: 'block' }} />
+        <Button onClick={applyDefaultUsername} disabled={props.defaultUsername === defaultUsername} variant="contained" color={'info'}>
+          反映
+        </Button>
+      </div>
+      <div className={classes.content}>
+        <Typography variant="h6">マイキャラ名</Typography>
+        {/* add */}
+        <TextField multiline={false} inputRef={mycharaTxtRef} fullWidth={true} style={{ width: '80vw', display: 'block' }} placeholder={'自分のマイキャラ名'} />
+        <Button onClick={addMycharaname} variant="contained" color={'info'}>
+          追加
+        </Button>
+
+        {/* disp & delete */}
+        <Paper>
+          {props.mycharaNameList.map((item) => (
+            <div key={item} style={{ display: 'flex', alignItems: 'center' }}>
+              <div style={{ width: '8em' }}>{item}</div>
+              <div>
+                <IconButton onClick={deleteMycharaname(item)} color={'error'}>
+                  <DeleteIcon />
+                </IconButton>
+              </div>
+            </div>
+          ))}
+        </Paper>
+      </div>
     </div>
   );
 };
@@ -187,6 +247,8 @@ const mapStateToProps = (state: RootState) => {
     qrsize: state.content.displaySetting.qrSize,
     theme: state.content.theme,
     ignoreList: state.content.ignoreCharaList,
+    defaultUsername: state.content.defaultUsername,
+    mycharaNameList: state.content.mycharaNameList,
   };
 };
 
@@ -196,6 +258,9 @@ const mapDispatchToProps = {
   changeNotify: actions.changeNotify,
   updateQrSize: actions.updateDispQr,
   updateIgnoreList: actions.updateMycharaIgnoreList,
+  updateDefaultUsername: actions.updateDefaultUsername,
+  addMycharaName: actions.addMycharaName,
+  deleteMycharaName: actions.deleteMycharaName,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

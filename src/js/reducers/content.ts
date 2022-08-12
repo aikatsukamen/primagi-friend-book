@@ -38,6 +38,11 @@ export type ContentState = {
     qrSize: number;
     readerDeviceId: string;
   };
+
+  /** データ登録のときの所有者名 */
+  defaultUsername: string;
+  /** 自分のマイキャラ名のリスト */
+  mycharaNameList: string[];
 };
 
 export const initial: ContentState = {
@@ -57,6 +62,8 @@ export const initial: ContentState = {
     qrSize: 100,
     readerDeviceId: '',
   },
+  defaultUsername: '',
+  mycharaNameList: [],
 };
 
 const reducer = (state: ContentState = initial, action: Action): ContentState => {
@@ -109,6 +116,27 @@ const reducer = (state: ContentState = initial, action: Action): ContentState =>
           ...state.displaySetting,
           qrSize: action.payload,
         },
+      };
+    }
+
+    case getType(actions.updateDefaultUsername): {
+      return {
+        ...state,
+        defaultUsername: action.payload,
+      };
+    }
+
+    case getType(actions.addMycharaName): {
+      return {
+        ...state,
+        mycharaNameList: [...state.mycharaNameList, action.payload],
+      };
+    }
+
+    case getType(actions.deleteMycharaName): {
+      return {
+        ...state,
+        mycharaNameList: state.mycharaNameList.filter((item) => item !== action.payload),
       };
     }
 
