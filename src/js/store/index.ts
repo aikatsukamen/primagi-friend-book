@@ -1,6 +1,6 @@
 import { createStore, applyMiddleware, compose } from 'redux';
 import createSagaMiddleware from 'redux-saga';
-import reducer from '../reducers';
+import reducer, { RootState } from '../reducers';
 import rootSaga from '../sagas';
 import { initial } from '../reducers/notify';
 import { initial as contentInitial } from '../reducers/content';
@@ -13,13 +13,20 @@ export default function configureStore() {
 
   const stateStr = localStorage.getItem('reduxState_conntent');
   const persistedState = stateStr
-    ? {
-        notify: initial as any,
-        content: {
-          ...contentInitial,
-          ...JSON.parse(stateStr),
-        },
-      }
+    ? (() => {
+        const stateJson: RootState['content'] = JSON.parse(stateStr);
+        // 型を変えたので旧版のstateを無理やり上書きする
+        if (!Array.isArray(stateJson.favList)) {
+          stateJson.favList = [];
+        }
+        return {
+          notify: initial as any,
+          content: {
+            ...contentInitial,
+            ...stateJson,
+          },
+        };
+      })()
     : {};
 
   const store = createStore(reducer, persistedState, composeEnhancers(applyMiddleware(sagaMiddleware)));
