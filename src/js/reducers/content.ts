@@ -6,10 +6,10 @@ import { Card } from '../types/global';
 type Action = ActionType<typeof actions>;
 
 export enum SortType {
-  CREATE_TIME_ASC,
-  CREATE_TIME_DESC,
-  NAME_ASC,
-  NAME_DESC,
+  TIMESTAMP_ASC,
+  TIMESTAMP_DESC,
+  CHARA_NAME_ASC,
+  CHARA_NAME_DESC,
 }
 
 export type ContentState = {
@@ -19,8 +19,10 @@ export type ContentState = {
   mycharaList: Card[];
   /** お気に入りQRリスト */
   favList: {
-    [qr: string]: number;
-  };
+    id: string;
+    name: string;
+    cards: string[];
+  }[];
   /** ソート種別 */
   sortType: SortType;
   theme: {
@@ -44,8 +46,8 @@ export const initial: ContentState = {
   cardList: [],
   mycharaList: [],
   ignoreCharaList: [],
-  favList: {},
-  sortType: SortType.CREATE_TIME_ASC,
+  favList: [],
+  sortType: SortType.TIMESTAMP_DESC,
   theme: {
     mode: 'light',
     theme: customTheme('light'),
@@ -109,6 +111,77 @@ const reducer = (state: ContentState = initial, action: Action): ContentState =>
           ...state.displaySetting,
           qrSize: action.payload,
         },
+      };
+    }
+
+    case getType(actions.changeSortType): {
+      return {
+        ...state,
+        sortType: action.payload,
+      };
+    }
+
+    case getType(actions.createFavorite): {
+      const id = new Date().getTime() - 1665661000000;
+      return {
+        ...state,
+        favList: [
+          ...state.favList,
+          {
+            id: id.toString(),
+            name: action.payload,
+            cards: [],
+          },
+        ],
+      };
+    }
+
+    case getType(actions.changeFavorite): {
+      return {
+        ...state,
+        favList: state.favList.map((item) => {
+          let name = item.name;
+          if (item.id === action.payload.id) {
+            name = action.payload.name;
+          }
+          return {
+            ...item,
+            name,
+          };
+        }),
+      };
+    }
+
+    case getType(actions.deleteFavorite): {
+      return {
+        ...state,
+        favList: state.favList.filter((item) => item.id !== action.payload),
+      };
+    }
+    case getType(actions.favoriteAddCard): {
+      return {
+        ...state,
+        favList: state.favList.map((item) => {
+          return {
+            ...item,
+            cards: [...item.cards, action.payload.qr],
+          };
+        }),
+      };
+    }
+    case getType(actions.favoriteDeleteCard): {
+      return {
+        ...state,
+        favList: state.favList.map((item) => {
+          if (item.id === action.payload.id) {
+            return {
+              ...item,
+              cards: item.cards.filter((card) => card !== action.payload.qr),
+            };
+          } else {
+            return item;
+          }
+        }),
       };
     }
 

@@ -80,3 +80,39 @@ const UPDATE_MYCHARA_IGNORE_LIST = 'UPDATE_MYCHARA_IGNORE_LIST';
 export const updateMycharaIgnoreList = createAction(UPDATE_MYCHARA_IGNORE_LIST, (action) => {
   return (nameList: string[]) => action(nameList);
 });
+
+/** ソート順変更 */
+const CHANGE_SORT_TYPE = 'CHANGE_SORT_TYPE';
+export const changeSortType = createAction(CHANGE_SORT_TYPE, (action) => {
+  return (sortType: SortType) => action(sortType);
+});
+
+/** お気に入り作成 */
+const CREATE_FAVORITE = 'CREATE_FAVORITE';
+export const createFavorite = createAction(CREATE_FAVORITE, (action) => {
+  return (name: string) => action(name);
+});
+
+/** お気に入り名変更 */
+const CHANGE_FAVORITE = 'CHANGE_FAVORITE';
+export const changeFavorite = createAction(CHANGE_FAVORITE, (action) => {
+  return (id: string, name: string) => action({ id, name });
+});
+
+/** お気に入り削除 */
+const DELETE_FAVORITE = 'DELETE_FAVORITE';
+export const deleteFavorite = createAction(DELETE_FAVORITE, (action) => {
+  return (id: string) => action(id);
+});
+
+/** お気に入りにカード追加 */
+const FAVORITE_ADD_CARD = 'FAVORITE_ADD_CARD';
+export const favoriteAddCard = createAction(FAVORITE_ADD_CARD, (action) => {
+  return (id: string, qr: string) => action({ id, qr });
+});
+
+/** お気に入りからカード削除 */
+const FAVORITE_DELETE_CARD = 'FAVORITE_DELETE_CARD';
+export const favoriteDeleteCard = createAction(FAVORITE_DELETE_CARD, (action) => {
+  return (id: string, qr: string) => action({ id, qr });
+});
