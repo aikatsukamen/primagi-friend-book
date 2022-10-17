@@ -12,6 +12,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import NoFavoriteIcon from '@mui/icons-material/FavoriteBorder';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { SortType } from '../../../reducers/content';
 
@@ -59,6 +60,10 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
   const [dispUserNameTags, setUserNameDispTags] = React.useState<string[]>([]);
   const [dispGeneralTags, setGeneralDispTags] = React.useState<string[]>([]);
   const [viewFavoriteId, setViewFavoriteId] = React.useState<string | null>(null);
+
+  // favListのアンカー
+  const [favCardAnchorEl, setFavCardAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [favAnchorEl, setFavAnchorEl] = React.useState<null | HTMLElement>(null);
 
   useEffect(() => {
     setDispCardList(props.cardList);
@@ -341,14 +346,13 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
   };
 
   const createFavListMenu = () => {
-    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-    const open = Boolean(anchorEl);
+    const open = Boolean(favAnchorEl);
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-      setAnchorEl(event.currentTarget);
+      setFavAnchorEl(event.currentTarget);
     };
     // メニューの各項目クリック
     const handleClose = (id: string) => () => {
-      setAnchorEl(null);
+      setFavAnchorEl(null);
       if (!id) return;
       if (id === 'new') {
         // 新規追加
@@ -366,10 +370,16 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
       }
     };
 
-    const handleDeleteFavorite = (id: string) => () => {
-      const confirmed = confirm('ほんとに消す？');
+    const handleDeleteFavorite = (id: string) => (event: any) => {
+      event.stopPropagation();
+      const name = props.favList.find((item) => item.id === id)?.name;
+      const confirmed = confirm(`「${name}」をほんとに消す？`);
       if (confirmed) {
         props.deleteFavorite(id);
+        // タグからも消す
+        if (viewFavoriteId === id) {
+          setViewFavoriteId(null);
+        }
       }
     };
 
@@ -379,17 +389,17 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
           id="basic-button"
           color={'inherit'}
           variant={'contained'}
-          style={{ margin: 10, marginTop: 0, marginBottom: 0, height: '100%' }}
+          style={{ margin: 10, marginTop: 0, marginBottom: 0, padding: 0, height: '100%' }}
           aria-controls={open ? 'basic-menu' : undefined}
           aria-haspopup="true"
           aria-expanded={open ? 'true' : undefined}
           onClick={handleClick}
         >
-          <FavoriteIcon color={'error'} />
+          <FavoriteIcon color={'error'} sx={{ fontSize: 40 }} />
         </Button>
         <Menu
           id="basic-menu"
-          anchorEl={anchorEl}
+          anchorEl={favAnchorEl}
           open={open}
           onClose={handleClose('')}
           MenuListProps={{
@@ -398,8 +408,8 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
         >
           {props.favList.map((item) => {
             return (
-              <MenuItem key={`${item.id}`}>
-                <DeleteIcon color={'error'} onClick={handleDeleteFavorite(item.id)} style={{ marginRight: 10 }} /> <span onClick={handleClose(item.id)}>{item.name}</span>
+              <MenuItem key={`${item.id}`} onClick={handleClose(item.id)}>
+                <DeleteIcon color={'error'} onClick={handleDeleteFavorite(item.id)} style={{ marginRight: 10 }} /> <span>{item.name}</span>
               </MenuItem>
             );
           })}
@@ -411,17 +421,28 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
     );
   };
 
+  /** カード一覧の方で表示するお気に入り登録・削除メニュー */
   const createAddFavMenu = () => {
-    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-    const open = Boolean(anchorEl);
+    const open = Boolean(favCardAnchorEl);
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-      setAnchorEl(event.currentTarget);
+      setFavCardAnchorEl(event.currentTarget);
     };
     // メニューの各項目クリック
-    const handleClose = (id: string) => () => {
-      setAnchorEl(null);
-      props.favoriteAddCard(id, openCard.qr);
+    const handleClose = () => {
+      setFavCardAnchorEl(null);
     };
+
+    const handleFavorite = (favid: string, qr: string, isRegistered: boolean) => (event: any) => {
+      event.stopPropagation();
+      if (isRegistered) {
+        props.favoriteDeleteCard(favid, qr);
+        console.log(`delete ${favid}, ${qr}`);
+      } else {
+        props.favoriteAddCard(favid, qr);
+        console.log(`add ${favid}, ${qr}`);
+      }
+    };
+    console.log(props.favList);
 
     return (
       <div>
@@ -434,12 +455,13 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
           aria-haspopup="true"
           aria-expanded={open ? 'true' : undefined}
           onClick={handleClick}
+          className={props.theme === 'light' ? 'bokashi' : 'bokashiDark'}
         >
-          <FavoriteIcon color={'error'} />
+          お気に入りに追加
         </Button>
         <Menu
           id="basic-menu"
-          anchorEl={anchorEl}
+          anchorEl={favCardAnchorEl}
           open={open}
           onClose={handleClose}
           MenuListProps={{
@@ -447,8 +469,10 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
           }}
         >
           {props.favList.map((item) => {
+            const isRegistered = item.cards.includes(openCard.qr);
             return (
-              <MenuItem key={`${item.id}`} onClick={handleClose(item.id)}>
+              <MenuItem key={`${item.id}`} onClick={handleFavorite(item.id, openCard.qr, isRegistered)}>
+                {isRegistered ? <FavoriteIcon /> : <NoFavoriteIcon />}
                 {item.name}
               </MenuItem>
             );
@@ -544,8 +568,6 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
                     </Typography>
                     <Typography className={props.theme === 'light' ? 'bokashi' : 'bokashiDark'}>{yyyymmdd(openCard.timestamp)}</Typography>
 
-                    {createAddFavMenu()}
-
                     {/* タグ */}
                     <div style={{ marginTop: 30 }}>
                       {/* username */}
@@ -575,6 +597,8 @@ const App: React.SFC<PropsType> = (props: PropsType) => {
                         );
                       })}
                     </div>
+
+                    {props.favList.length !== 0 && createAddFavMenu()}
                   </div>
                 </>
               ) : (
@@ -607,8 +631,9 @@ const mapDispatchToProps = {
   changeNotify: actions.changeNotify,
   changeSortType: actions.changeSortType,
   createFavorite: actions.createFavorite,
-  favoriteAddCard: actions.favoriteAddCard,
   deleteFavorite: actions.deleteFavorite,
+  favoriteAddCard: actions.favoriteAddCard,
+  favoriteDeleteCard: actions.favoriteDeleteCard,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

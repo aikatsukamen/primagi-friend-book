@@ -190,10 +190,14 @@ const reducer = (state: ContentState = initial, action: Action): ContentState =>
       return {
         ...state,
         favList: state.favList.map((item) => {
-          return {
-            ...item,
-            cards: [...item.cards, action.payload.qr],
-          };
+          if (item.id === action.payload.id) {
+            return {
+              ...item,
+              cards: [...item.cards, action.payload.qr],
+            };
+          } else {
+            return item;
+          }
         }),
       };
     }
